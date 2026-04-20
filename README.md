@@ -1,9 +1,12 @@
-# Clinical Automata 🤖
+# [arXiv'26] From Clinical Intent to Clinical Model: An Autonomous Coding-Agent Framework for Clinician-driven AI Development 🤖
+---
+Clinical Automata lets a clinician describe a problem in plain language — *"help me diagnose pneumothorax, but don't let the model cheat by looking at chest drains"* — and returns a trained, task-specific deep-learning model. No data-science middleman required. 
+
+<p align="left">by Zihao Zhao, Frederik Hauke, Juliana De Castilhos, Jakob Nikolas Kather, Sven Nebelung, and Daniel Truhn</p>
 
 
-Clinical Automata lets a clinician describe a problem in plain language — *"help me diagnose pneumothorax, but don't let the model cheat by looking at chest drains"* — and returns a trained, task-specific deep-learning model. No data-science middleman required.
 
-📄 **Paper:** *From Clinical Intent to Clinical Model: An Autonomous Coding-Agent Framework for Clinician-driven AI Development* (Zhao et al., 2026)
+<!-- 📄 **Paper:** *From Clinical Intent to Clinical Model: An Autonomous Coding-Agent Framework for Clinician-driven AI Development* (Zhao et al., 2026) -->
 
 <div align="center">
   <img src="asset/teaser.png" style="width: 90%">
@@ -15,16 +18,16 @@ Clinical Automata lets a clinician describe a problem in plain language — *"he
 
 ---
 
-## Why this exists
+## Autonomous development
+ 
+The agent proposes a pipeline, and then improve it iteratively through training/validation.Below is a real refinement trajectory on the mixed-supervision wrist-fracture task, where only 5% of training images had bounding boxes. Starting from a 0.582 mAP@50 baseline, the agent climbed to **0.87** by autonomously discovering three key moves: distributed training with a larger batch size (run 2), curated negatives (run 6), and a teacher–student pseudo-labeling strategy that exploited the 95% image-level-only pool (run 8).
+ 
+<!-- ![Autonomous refinement trajectory on the mixed-supervision wrist-fracture task.](asset/evolution.png) -->
+<div align="center">
+  <img src="asset/evolution.png" style="width: 95%">
+</div>
 
-Clinical AI has traditionally needed a long chain: clinician → AI expert → data pipeline → model → back to clinician. Each handoff takes time, and clinical priorities (*"do not miss a single melanoma"*, *"don't rely on chest drains"*) often get lost in translation.
-
-Clinical Automata replaces the intermediate human bottleneck with an autonomous coding agent that is **not a specialist in either medicine or ML, but broad enough to bridge the two**. The clinician stays in control of *intent*; the agent handles *implementation*.
-
-```
-Before:   Doctor  ⇄  AI Expert  ⇄  AI Model
-After:    Doctor  ⇄  Clinical Automata  ⇄  AI Model
-```
+Notably, most of the gain comes from a handful of successful edits out of 30 attempts. The rest edits marked by gray circle are discarded by the acceptance rule.
 
 ---
 
@@ -40,44 +43,42 @@ Under the hood, the three roles are played by a coding agent (Claude Opus 4.6 in
 
 ---
 
-
-## Example requests
-
-The system is initiated with clinician-style natural language — no ML jargon required.
-
-```text
-"I want an AI model to help diagnose skin lesions. Priority should be given to melanoma."
-
-"I want to distinguish melanoma from nevus. Please try your best not to miss a single case."
-
-"I need a tool that looks at wrist X-rays and marks suspicious fractures during my workflow."
-
-"I want to diagnose pneumothorax on chest X-rays. My concern is that chest drains may act
- as a strong confounder — please take this issue seriously."
-```
-
-Each one produced a runnable pipeline and a meaningfully refined model. The agent interpreted asymmetric error preferences ("don't miss melanomas" → sensitivity emphasis, focal loss), inferred supervision structure, and implemented deconfounding methods without being told which technique to use.
-
----
-
-## Repository layout
+## Project structure
 
 ```
-src/
-├── Parser.md              # Semantic parser, task initializer, autonomous developer
-├── program.md               # Task templates (classification, detection, debiasing, ...)
-├── README.md            # Dataset adapters (ISIC, GRAZPEDWRI-DX, SIIM-ACR, NEATX)
-├── gpu.sh             # Iterative train/val loop, result logging, acceptance rule
-├── uv.lock                # Held-out test evaluation + bootstrap CIs
-├── pyproject.toml            # End-to-end reproductions of the five paper tasks
-└── prepare.py             # Compute, iteration budget, model-selection criteria
+  clinical-automata/
+  ├── README.md           # This file                                                                       
+  ├── asset/              # Figures used in README      
+  └── src/                                                                                                  
+      ├── Parser.md       # Semantic parser prompt: clinician request → structured task spec                
+      ├── program.md      # Task Initializer & Autonomous Developer prompts                                 
+      ├── README.md       # In-repo context provided to the coding agent                                    
+      ├── prepare.py      # Constants and setup helpers                                                     
+      ├── gpu.sh          # GPU request script (SLURM)                                                      
+      ├── pyproject.toml  # Project metadata and Python dependencies                                        
+      └── uv.lock         # Locked dependency versions (uv)   
 ```
 
 ---
 
 ## Quick start
 
+
 ```bash
+
+# 1. Install uv project manager (if you don't already have it)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 2. Install dependencies
+uv sync
+
+# 3. Download and activate Claude CLI
+curl -fsSL https://claude.ai/install.sh | bash
+
+claude --permission-mode bypassPermissions
+
+# 4. Prompt something like
+[$your_request$] Please review program.md and start a new experiment. Let us begin with the setup first.
 ```
 
 
@@ -88,7 +89,7 @@ src/
 - Python ≥ 3.10
 - PyTorch ≥ 2.1, CUDA-capable GPU
 - Access to a capable coding agent (Claude Opus 4.6 CLI used in the paper)
-- The code agent will automatically install dataset or task specific packages during experiments, and src/uv.lock has actually been modified through experiments. Please refer to https://github.com/karpathy/autoresearch/blob/master/uv.lock for a minimum runable environment construction.
+- During experiments, the coding agent installs dataset- and task-specific packages on demand, so `src/uv.lock` reflects the accumulated state of past runs rather than a clean baseline. For a minimal working environment, refer to the lockfile in [karpathy/autoresearch](https://github.com/karpathy/autoresearch/blob/master/uv.lock).
 ---
 
 ## Citation
