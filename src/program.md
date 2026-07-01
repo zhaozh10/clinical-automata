@@ -169,10 +169,10 @@ commit	$primary_metric	$metrics_summary memory_gb	status	description
 Example:
 
 ```text
-a1b2c3d	0.9123	0.8521 44.0	keep	baseline 0.9023	0.8221
-b2c3d4e	0.9250	0.8852 44.2	keep	add augmentation 0.9133	0.8321
-c3d4e5f	0.9010	0.8311 44.0	discard	worse performance nan nan
-d4e5f6g	nan	   nan     0.0	crash	OOM nan nan
+a1b2c3d	0.9123	0.8521 44.0	keep	baseline
+b2c3d4e	0.9250	0.8852 44.2	keep	add augmentation
+c3d4e5f	0.9010	0.8311 44.0	discard	worse performance
+d4e5f6g	nan	   nan     0.0	crash	OOM
 ```
 
 ---
