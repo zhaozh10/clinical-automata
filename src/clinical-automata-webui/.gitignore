@@ -1,0 +1,22 @@
+# backend harness lives as a sibling repo (kept for safety if ever nested)
+clinical-automata-backend/
+
+# python
+backend/.venv/
+**/__pycache__/
+*.pyc
+backend/_work/
+.env
+
+# node / frontend build
+frontend/node_modules/
+frontend/dist/
+
+# logs / scratch
+*.log
+
+# tsc build info
+frontend/*.tsbuildinfo
+
+# access codes (secret-ish, do not commit)
+access_codes.txt

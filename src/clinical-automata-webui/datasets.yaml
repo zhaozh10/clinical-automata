@@ -1,0 +1,476 @@
+# Dataset showcase manifest.
+# `key` MUST match the keys in ../clinical-automata-backend/prepare.py.
+# Real filesystem paths are NOT here — they stay server-side in prepare.py.
+#
+# We deliberately do NOT predefine tasks (that would prime the clinician).
+# Instead we state what annotations the dataset provides and which label
+# categories those annotations cover (no class distribution).
+#
+# Localization (`i18n`): clinicians know disease and organ names in their own
+# working language, so display_name / modality / annotations / label_categories
+# / description are translated per language. NEVER translated, in any language:
+#   * `dataset`    — the dataset's own name (ISIC 2019, PAX-ray++, …)
+#   * `license`    — a legal identifier (CC BY-NC, …)
+#   * `source_url`
+# A field missing from an i18n block falls back to the English value above it.
+
+- key: "dermoscopy"
+  display_name: "Dermoscopy — skin lesions"
+  dataset: "ISIC 2019"
+  modality: "Dermoscopic image"
+  num_images: 25331
+  annotations:
+    - "Image-level diagnosis label (one class per image)"
+  label_categories:
+    - "Melanoma (MEL)"
+    - "Melanocytic nevus (NV)"
+    - "Basal cell carcinoma (BCC)"
+    - "Actinic keratosis (AK)"
+    - "Benign keratosis (BKL)"
+    - "Dermatofibroma (DF)"
+    - "Vascular lesion (VASC)"
+    - "Squamous cell carcinoma (SCC)"
+  license: "CC BY-NC"
+  source_url: "https://challenge.isic-archive.com/data/"
+  description: >
+    Dermoscopy images from the International Skin Imaging Collaboration, each
+    labelled with a single diagnostic category.
+  i18n:
+    de:
+      display_name: "Dermatoskopie — Hautläsionen"
+      modality: "Dermatoskopisches Bild"
+      annotations:
+        - "Diagnose-Label auf Bildebene (eine Klasse pro Bild)"
+      label_categories:
+        - "Melanom (MEL)"
+        - "Melanozytärer Nävus (NV)"
+        - "Basalzellkarzinom (BCC)"
+        - "Aktinische Keratose (AK)"
+        - "Benigne Keratose (BKL)"
+        - "Dermatofibrom (DF)"
+        - "Vaskuläre Läsion (VASC)"
+        - "Plattenepithelkarzinom (SCC)"
+      description: >
+        Dermatoskopische Aufnahmen der International Skin Imaging Collaboration,
+        jeweils mit genau einer diagnostischen Kategorie gelabelt.
+    ja:
+      display_name: "ダーモスコピー — 皮膚病変"
+      modality: "ダーモスコピー画像"
+      annotations:
+        - "画像単位の診断ラベル（1画像につき1クラス）"
+      label_categories:
+        - "悪性黒色腫（メラノーマ, MEL）"
+        - "色素性母斑（NV）"
+        - "基底細胞癌（BCC）"
+        - "日光角化症（AK）"
+        - "良性角化症（BKL）"
+        - "皮膚線維腫（DF）"
+        - "血管性病変（VASC）"
+        - "有棘細胞癌（SCC）"
+      description: >
+        International Skin Imaging Collaboration によるダーモスコピー画像。
+        各画像に単一の診断カテゴリが付与されています。
+    zh:
+      display_name: "皮肤镜 — 皮肤病变"
+      modality: "皮肤镜图像"
+      annotations:
+        - "图像级诊断标签（每张图像一个类别）"
+      label_categories:
+        - "黑色素瘤（MEL）"
+        - "色素痣（NV）"
+        - "基底细胞癌（BCC）"
+        - "光化性角化病（AK）"
+        - "良性角化病（BKL）"
+        - "皮肤纤维瘤（DF）"
+        - "血管性病变（VASC）"
+        - "鳞状细胞癌（SCC）"
+      description: >
+        来自 International Skin Imaging Collaboration 的皮肤镜图像，
+        每张图像标注一个诊断类别。
+
+- key: "wrist x-ray"
+  display_name: "Wrist X-ray — pediatric"
+  dataset: "GRAZPEDWRI-DX"
+  modality: "Pediatric wrist radiograph"
+  num_images: 20327
+  annotations:
+    - "Bounding boxes (object-level)"
+    - "Image-level labels"
+  label_categories:
+    - "Fracture"
+    - "Bone anomaly"
+    - "Foreign body"
+    - "Metal"
+    - "Periosteal reaction"
+    - "Pronator sign"
+    - "Soft tissue"
+    - "Text/markers"
+  license: "CC BY 4.0"
+  source_url: "https://figshare.com/articles/dataset/GRAZPEDWRI-DX/14825193"
+  description: >
+    Pediatric wrist radiographs with radiologist-drawn bounding boxes for
+    fractures and several secondary findings, plus image-level labels.
+  i18n:
+    de:
+      display_name: "Handgelenk-Röntgen — pädiatrisch"
+      modality: "Pädiatrische Handgelenksaufnahme"
+      annotations:
+        - "Bounding Boxes (objektbezogen)"
+        - "Labels auf Bildebene"
+      label_categories:
+        - "Fraktur"
+        - "Knochenanomalie"
+        - "Fremdkörper"
+        - "Metall"
+        - "Periostreaktion"
+        - "Pronator-Zeichen"
+        - "Weichteile"
+        - "Text / Marker"
+      description: >
+        Pädiatrische Handgelenksaufnahmen mit von Radiologen eingezeichneten
+        Bounding Boxes für Frakturen und mehrere Nebenbefunde, zusätzlich
+        Labels auf Bildebene.
+    ja:
+      display_name: "手関節X線 — 小児"
+      modality: "小児手関節単純X線写真"
+      annotations:
+        - "バウンディングボックス（対象単位）"
+        - "画像単位のラベル"
+      label_categories:
+        - "骨折"
+        - "骨の異常"
+        - "異物"
+        - "金属"
+        - "骨膜反応"
+        - "回内筋徴候（pronator sign）"
+        - "軟部組織"
+        - "文字・マーカー"
+      description: >
+        小児の手関節単純X線写真。放射線科医が描画した骨折および複数の副次所見の
+        バウンディングボックスと、画像単位のラベルが付与されています。
+    zh:
+      display_name: "腕关节 X 线 — 儿童"
+      modality: "儿童腕关节 X 线片"
+      annotations:
+        - "边界框（目标级）"
+        - "图像级标签"
+      label_categories:
+        - "骨折"
+        - "骨质异常"
+        - "异物"
+        - "金属"
+        - "骨膜反应"
+        - "旋前肌征"
+        - "软组织"
+        - "文字与标记"
+      description: >
+        儿童腕关节 X 线片，含放射科医师标注的骨折及多种次要征象的边界框，
+        以及图像级标签。
+
+- key: "chest x-ray (pneumothorax)"
+  display_name: "Chest X-ray — pneumothorax"
+  dataset: "SIIM-ACR Pneumothorax"
+  modality: "Chest radiograph"
+  num_images: 12047
+  annotations:
+    - "Image-level label (pneumothorax present / absent)"
+    - "Pixel-level segmentation mask of the pneumothorax region"
+  label_categories:
+    - "Pneumothorax (positive)"
+    - "No pneumothorax (negative)"
+  license: "Kaggle competition terms"
+  source_url: "https://www.kaggle.com/competitions/siim-acr-pneumothorax-segmentation"
+  description: >
+    Chest radiographs with expert pixel-level masks marking pneumothorax
+    regions and image-level positive/negative labels.
+  i18n:
+    de:
+      display_name: "Thorax-Röntgen — Pneumothorax"
+      modality: "Thoraxaufnahme"
+      annotations:
+        - "Label auf Bildebene (Pneumothorax vorhanden / nicht vorhanden)"
+        - "Pixelgenaue Segmentierungsmaske des Pneumothorax-Bereichs"
+      label_categories:
+        - "Pneumothorax (positiv)"
+        - "Kein Pneumothorax (negativ)"
+      description: >
+        Thoraxaufnahmen mit pixelgenauen Expertenmasken des Pneumothorax-Bereichs
+        sowie Positiv-/Negativ-Labels auf Bildebene.
+    ja:
+      display_name: "胸部X線 — 気胸"
+      modality: "胸部単純X線写真"
+      annotations:
+        - "画像単位のラベル（気胸あり / なし）"
+        - "気胸領域のピクセル単位セグメンテーションマスク"
+      label_categories:
+        - "気胸あり（陽性）"
+        - "気胸なし（陰性）"
+      description: >
+        胸部単純X線写真。専門医によるピクセル単位の気胸領域マスクと、
+        画像単位の陽性・陰性ラベルが付与されています。
+    zh:
+      display_name: "胸部 X 线 — 气胸"
+      modality: "胸部 X 线片"
+      annotations:
+        - "图像级标签（有 / 无气胸）"
+        - "气胸区域的像素级分割掩码"
+      label_categories:
+        - "气胸（阳性）"
+        - "无气胸（阴性）"
+      description: >
+        胸部 X 线片，含专家标注的气胸区域像素级掩码，以及图像级阳性/阴性标签。
+
+- key: "chest x-ray (14 diseases)"
+  display_name: "Chest X-ray — thorax findings"
+  dataset: "NIH ChestX-ray14"
+  modality: "Chest radiograph"
+  num_images: 112120
+  annotations:
+    - "Image-level multi-label (multiple findings per image)"
+  label_categories:
+    - "Atelectasis"
+    - "Cardiomegaly"
+    - "Effusion"
+    - "Infiltration"
+    - "Mass"
+    - "Nodule"
+    - "Pneumonia"
+    - "Pneumothorax"
+    - "Consolidation"
+    - "Edema"
+    - "Emphysema"
+    - "Fibrosis"
+    - "Pleural thickening"
+    - "Hernia"
+  license: "NIH Clinical Center (open access)"
+  source_url: "https://nihcc.app.box.com/v/ChestXray-NIHCC"
+  description: >
+    Frontal chest radiographs with image-level labels for 14 common thorax
+    findings; each image may carry several findings at once.
+  i18n:
+    de:
+      display_name: "Thorax-Röntgen — Thoraxbefunde"
+      modality: "Thoraxaufnahme"
+      annotations:
+        - "Multi-Label auf Bildebene (mehrere Befunde pro Bild möglich)"
+      label_categories:
+        - "Atelektase"
+        - "Kardiomegalie"
+        - "Pleuraerguss"
+        - "Infiltration"
+        - "Raumforderung"
+        - "Rundherd"
+        - "Pneumonie"
+        - "Pneumothorax"
+        - "Konsolidierung"
+        - "Ödem"
+        - "Emphysem"
+        - "Fibrose"
+        - "Pleuraverdickung"
+        - "Hernie"
+      description: >
+        Frontale Thoraxaufnahmen mit Labels auf Bildebene für 14 häufige
+        Thoraxbefunde; pro Bild können mehrere Befunde gleichzeitig vorliegen.
+    ja:
+      display_name: "胸部X線 — 胸部所見"
+      modality: "胸部単純X線写真"
+      annotations:
+        - "画像単位のマルチラベル（1画像に複数の所見）"
+      label_categories:
+        - "無気肺"
+        - "心拡大"
+        - "胸水"
+        - "浸潤影"
+        - "腫瘤"
+        - "結節"
+        - "肺炎"
+        - "気胸"
+        - "硬化像（コンソリデーション）"
+        - "肺水腫"
+        - "肺気腫"
+        - "線維化"
+        - "胸膜肥厚"
+        - "ヘルニア"
+      description: >
+        正面像の胸部単純X線写真。14種類の代表的な胸部所見について画像単位の
+        ラベルが付与されており、1枚の画像に複数の所見が同時に存在しえます。
+    zh:
+      display_name: "胸部 X 线 — 胸部征象"
+      modality: "胸部 X 线片"
+      annotations:
+        - "图像级多标签（一张图像可含多个征象）"
+      label_categories:
+        - "肺不张"
+        - "心影增大"
+        - "胸腔积液"
+        - "浸润影"
+        - "肿块"
+        - "结节"
+        - "肺炎"
+        - "气胸"
+        - "实变"
+        - "肺水肿"
+        - "肺气肿"
+        - "纤维化"
+        - "胸膜增厚"
+        - "疝"
+      description: >
+        正位胸部 X 线片，标注了 14 种常见胸部征象的图像级标签；
+        同一张图像可能同时存在多个征象。
+
+- key: "chest x-ray (anatomy segmentation)"
+  display_name: "Chest X-ray — anatomy"
+  dataset: "PAX-ray++"
+  modality: "Chest radiograph"
+  annotations:
+    - "Dense pixel-level segmentation masks (per anatomical structure)"
+  label_categories:
+    - "Lungs (and lobes)"
+    - "Heart"
+    - "Mediastinum"
+    - "Ribs / bones"
+    - "Clavicles"
+    - "Diaphragm"
+    - "Airways"
+    - "…many fine-grained anatomical structures"
+  license: "Research use (see source)"
+  source_url: "https://github.com/ConstantinSeibold/ChestXRayAnatomySegmentation"
+  description: >
+    Chest radiographs with dense pixel-level segmentation labels covering many
+    fine-grained anatomical structures.
+  i18n:
+    de:
+      display_name: "Thorax-Röntgen — Anatomie"
+      modality: "Thoraxaufnahme"
+      annotations:
+        - "Dichte pixelgenaue Segmentierungsmasken (je anatomischer Struktur)"
+      label_categories:
+        - "Lunge (und Lungenlappen)"
+        - "Herz"
+        - "Mediastinum"
+        - "Rippen / Knochen"
+        - "Klavikeln"
+        - "Zwerchfell"
+        - "Atemwege"
+        - "…viele weitere feingliedrige anatomische Strukturen"
+      description: >
+        Thoraxaufnahmen mit dichten pixelgenauen Segmentierungslabels für
+        zahlreiche feingliedrige anatomische Strukturen.
+    ja:
+      display_name: "胸部X線 — 解剖構造"
+      modality: "胸部単純X線写真"
+      annotations:
+        - "高密度なピクセル単位セグメンテーションマスク（解剖構造ごと）"
+      label_categories:
+        - "肺（および肺葉）"
+        - "心臓"
+        - "縦隔"
+        - "肋骨・骨"
+        - "鎖骨"
+        - "横隔膜"
+        - "気道"
+        - "…その他多数の詳細な解剖構造"
+      description: >
+        胸部単純X線写真に、多数の詳細な解剖構造を対象とした高密度な
+        ピクセル単位のセグメンテーションラベルが付与されています。
+    zh:
+      display_name: "胸部 X 线 — 解剖结构"
+      modality: "胸部 X 线片"
+      annotations:
+        - "稠密的像素级分割掩码（按解剖结构）"
+      label_categories:
+        - "肺（及肺叶）"
+        - "心脏"
+        - "纵隔"
+        - "肋骨 / 骨性结构"
+        - "锁骨"
+        - "膈肌"
+        - "气道"
+        - "……以及更多精细的解剖结构"
+      description: >
+        胸部 X 线片，带有覆盖大量精细解剖结构的稠密像素级分割标注。
+
+- key: "pelvic ct (fracture)"
+  internal: true   # challenge data under CC BY-NC; withheld from the public demo
+  display_name: "Pelvic CT — bone fragments"
+  dataset: "PENGWIN 2026"
+  modality: "Pelvic / femoral CT (3D volume)"
+  num_images: 340
+  annotations:
+    - "Instance-level segmentation mask for every individual bone fragment (the label value also records which bone the fragment broke off from)"
+    - "One interaction point per fragment, provided in four different sampling styles for each scan"
+    - "3D surface meshes of the broken pelvis, each fragment paired with the rigid movement that returns it to its anatomically correct position"
+    - "A further collection of simulated fracture patterns generated on 480 intact pelvic CT scans"
+  label_categories:
+    - "Sacrum"
+    - "Left hipbone"
+    - "Right hipbone"
+    - "Left femur"
+    - "Right femur"
+  license: "CC BY-NC 4.0"
+  source_url: "https://pengwin2026.grand-challenge.org/"
+  description: >
+    Three-dimensional CT scans of patients scheduled for pelvic or femoral
+    fracture surgery. Each broken bone is annotated as several separate pieces
+    rather than as one structure, so the individual fragments can be told apart
+    and counted. A companion collection of surface meshes additionally records
+    where every fragment belongs once the bone is reassembled.
+  i18n:
+    de:
+      display_name: "Becken-CT — Knochenfragmente"
+      modality: "Becken-/Femur-CT (3D-Volumen)"
+      annotations:
+        - "Instanzgenaue Segmentierungsmaske für jedes einzelne Knochenfragment (der Labelwert hält zusätzlich fest, von welchem Knochen das Fragment stammt)"
+        - "Ein Interaktionspunkt pro Fragment, je Aufnahme in vier verschiedenen Setzvarianten"
+        - "3D-Oberflächennetze des gebrochenen Beckens, jedes Fragment mit der starren Bewegung, die es in seine anatomisch korrekte Lage zurückführt"
+        - "Zusätzlich eine Sammlung simulierter Frakturmuster, erzeugt auf 480 intakten Becken-CTs"
+      label_categories:
+        - "Kreuzbein (Sakrum)"
+        - "Linkes Hüftbein"
+        - "Rechtes Hüftbein"
+        - "Linker Femur"
+        - "Rechter Femur"
+      description: >
+        Dreidimensionale CT-Aufnahmen von Patientinnen und Patienten vor einer
+        Becken- oder Femurfraktur-Operation. Jeder gebrochene Knochen ist nicht
+        als eine Struktur, sondern als mehrere einzelne Bruchstücke annotiert,
+        sodass sich die Fragmente unterscheiden und zählen lassen. Eine
+        begleitende Sammlung von Oberflächennetzen hält zusätzlich fest, wohin
+        jedes Fragment nach der Reposition gehört.
+    ja:
+      display_name: "骨盤CT — 骨片"
+      modality: "骨盤・大腿骨CT（3Dボリューム）"
+      annotations:
+        - "個々の骨片ごとのインスタンス単位セグメンテーションマスク（ラベル値はその骨片がどの骨に由来するかも保持）"
+        - "骨片ごとに1点の指示点。1つの撮影につき4通りの置き方が提供されます"
+        - "骨折した骨盤の3D表面メッシュ。各骨片には、解剖学的に正しい位置へ戻すための剛体移動が付随します"
+        - "さらに、480例の骨折のない骨盤CTから生成したシミュレーション骨折パターン一式"
+      label_categories:
+        - "仙骨"
+        - "左寛骨"
+        - "右寛骨"
+        - "左大腿骨"
+        - "右大腿骨"
+      description: >
+        骨盤または大腿骨の骨折手術を予定する患者の3次元CT画像です。折れた骨は
+        1つの構造としてではなく複数の骨片として個別に注釈されており、各骨片を
+        区別して数えることができます。付随する表面メッシュ集には、整復後に各
+        骨片が収まるべき位置も記録されています。
+    zh:
+      display_name: "骨盆 CT — 骨折碎片"
+      modality: "骨盆 / 股骨 CT(三维体数据)"
+      annotations:
+        - "每一块骨折碎片各自一个实例分割掩膜(标签取值同时记录该碎片来自哪块骨)"
+        - "每块碎片一个交互点击点,同一次扫描提供四种不同的取点方式"
+        - "骨折骨盆的三维表面网格,每块碎片附带一个把它送回解剖复位位置的刚体变换"
+        - "另有一批在 480 例未骨折骨盆 CT 上生成的仿真骨折样式"
+      label_categories:
+        - "骶骨"
+        - "左髋骨"
+        - "右髋骨"
+        - "左股骨"
+        - "右股骨"
+      description: >
+        待行骨盆或股骨骨折手术患者的三维 CT 影像。断裂的骨骼不是作为一个整体
+        标注,而是逐块碎片分别标注,因而可以区分和计数每一块碎片。配套的表面
+        网格集合还记录了复位之后每块碎片应处的位置。

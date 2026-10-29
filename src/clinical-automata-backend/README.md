@@ -8,13 +8,14 @@ The idea: give an AI agent a small but real LLM training setup and let it experi
 
 ## How it works
 
-The repo is deliberately kept small and only really has three files that matter:
+The repo is deliberately kept small and only really has a handful of files that matter:
 
-- **`prepare.py`** — fixed constants, data paths, experiment config (not modified). Not modified.
+- **`prepare.py`** — fixed constants, data paths, experiment config. **Not modified.**
 - **`data.py`** - data preprocessing, augmentation, splitting (written by agent). **This file is edited and iterated on by the agent**.
 - **`train.py`** — model, optimizer, training loop, evaluation (written by agent). Everything is fair game: architecture, hyperparameters, optimizer, batch size, etc. **This file is edited and iterated on by the agent**.
 - **`program.md`** — baseline instructions for one agent. Point your agent here and let it go. **This file is edited and iterated on by the human**.
 - **`Parser.md`** — Protocols on how to interpret the doctor's request. **This file can't be edited**.
+- **`FINALIZE.md`** — what happens once the experiment loop ends。 **This file can't be edited**.
 
 By design, a single training run for a **fixed TIME_BUDGET_MINUTES time budget** (wall clock, excluding startup/compilation), regardless of the details of your compute. In each run, trains a model, evaluates on validation set, logs metrics, and saves checkpoints. This will loop MAX_LOOPS times
 
@@ -43,10 +44,18 @@ If the above commands all work ok, your setup is working and you can go into aut
 
 ## Running the agent
 
-Simply spin up your Claude/Codex or whatever you want in this repo (and disable all permissions), then you can prompt something like:
+Simply spin up your Claude/Codex or whatever you want in this repo (and disable all permissions).
+
+The agent starts in **consultation mode**: it will discuss the clinical
+question with you, ask about the cohort and the outcome, and point out what is
+or isn't feasible. It will not start any experiment during
+this phase. So just open with what you actually want, in your own words.
+
+Take as many turns as you need to pin down the question. When you are ready to
+start, send your task description with the following sentences attached:
 
 ```
-Hi have a look at program.md and readme.md. I want to have an AI model to help me [...]. Let's kick off a new experiment project! let's do the setup first.    
+Please have a look at program.md and kick off a new experiment! let's do the setup first.
 ```
 
 The `program.md` file is essentially a super lightweight "skill".
@@ -59,6 +68,8 @@ data.py         - data preprocessing, augmentation, splitting (written by agent 
 train.py        — model, optimizer, training loop (written by agent and can be modified)
 program.md      — agent instructions
 Parser.md      — instructions on how to interpret human input
+FINALIZE.md     — post-loop contract: test inference, deliverables, DONE.json
+FINALIZE.md     - 
 pyproject.toml  — dependencies
 ```
 
@@ -78,47 +89,47 @@ some practical tricks that are often much more useful than blindly scaling model
 
 2. Use medically appropriate augmentations. Strong natural-image augmentations can be harmful in medicine. Prefer restrained augmentations such as small rotations, flips only when anatomically valid, mild brightness / contrast jitter, light blur or noise only if it reflects acquisition variation. Avoid overly aggressive augmentation that changes pathology appearance or creates anatomically implausible samples.
 
-4. Handle class imbalance explicitly. Many medical datasets are highly imbalanced. Useful options include weighted loss, focal loss, class-balanced sampling, oversampling rare classes.  
+3. Handle class imbalance explicitly. Many medical datasets are highly imbalanced. Useful options include weighted loss, focal loss, class-balanced sampling, oversampling rare classes.  
 For screening-style tasks, improving minority-class recall is often more important than raw accuracy.
 
-5. In medical tasks, the best checkpoint is often not the one with the lowest validation loss. Depending on the medical task, prioritize metrics such as AUC, sensitivity / recall, specificity, F1, Youden-Index, Dice / IoU, etc. The training loss can stay standard, but model selection should follow the clinically relevant primary metric.
+4. In medical tasks, the best checkpoint is often not the one with the lowest validation loss. Depending on the medical task, prioritize metrics such as AUC, sensitivity / recall, specificity, F1, Youden-Index, Dice / IoU, etc. The training loss can stay standard, but model selection should follow the clinically relevant primary metric.
 
-6. Tune the decision threshold, not just the model weights. For many classification tasks, especially imbalanced ones, a large gain can come from selecting a better operating threshold on the validation set instead of using the default `0.5`. This is particularly important when the user wants higher sensitivity, fewer false negatives, or a specific sensitivity/specificity tradeoff.
+5. Tune the decision threshold, not just the model weights. For many classification tasks, especially imbalanced ones, a large gain can come from selecting a better operating threshold on the validation set instead of using the default `0.5`. This is particularly important when the user wants higher sensitivity, fewer false negatives, or a specific sensitivity/specificity tradeoff.
 
-7. Use pretrained backbones whenever possible.  
+6. Use pretrained backbones whenever possible.  
    Medical datasets are often small. Starting from pretrained models is usually a stronger baseline than training from scratch. The agent should consider:
    - `timm` backbones
    - Hugging Face vision backbones
    - domain-specific checkpoints if available and compatible  
    In many cases, a good pretrained encoder plus a simple head beats a fancy custom architecture.
 
-8. Freeze more, then unfreeze if needed.  
+7. Freeze more, then unfreeze if needed.  
    On small datasets, full fine-tuning can overfit or become unstable. A good default strategy is: (1) start with a frozen backbone and train the head, (2) then unfreeze later layers if validation saturates.
    This is often more compute-efficient and more stable.
 
-9. Use patient-level splitting whenever possible.  
+8. Use patient-level splitting whenever possible.  
    Medical datasets often contain multiple studies, views, slices, or tiles from the same patient. Splitting at the image level can leak information and produce overly optimistic results. If patient IDs exist, use patient-level splitting by default. Multi-view and multi-modal input are encouraged.
 
-10. Keep validation representative but cheap.  
+9. Keep validation representative but cheap.  
     Validation should remain stable across runs, but on small hardware it may be too expensive to run very frequently. A practical compromise is:
     - validate on the same fixed validation set
     - reduce validation frequency if needed
     - keep the evaluation function unchanged within the experiment loop
 
-11. For segmentation and detection, start simple.  
+10. For segmentation and detection, start simple.  
     Before trying a large architecture, first make sure (1) masks / boxes are loaded correctly (2) interpolation is correct (3) target alignment is correct (4) postprocessing is reasonable  
     Many failures in medical segmentation/detection come from pipeline bugs rather than model weakness.
 
-12. Watch calibration and confidence, not just discrimination.
+11. Watch calibration and confidence, not just discrimination.
     In clinical settings, a model with decent AUC but badly calibrated confidence can still be difficult to use. If relevant, consider logging:
     - calibration error
     - confidence histograms
     - sensitivity/specificity at chosen thresholds
 
-14. Prefer stable, reproducible wins over fragile complexity.  
+12. Prefer stable, reproducible wins over fragile complexity.  
     Medical datasets are often small and noisy. Tricks that give tiny gains but add a lot of engineering complexity are often not worth it. Simpler pipelines with robust validation are usually better foundations for autonomous iteration.
 
-15. **Important**.
+13. **Important**.
     When tuning `train.py` and `data.py`, improvement proposals should not remain concentrated on incremental knob-tuning alone once a stable version of method has been established. The agent should increasingly explore changes that are plausibly capable of producing qualitatively different behavior, rather than only small quantitative shifts from routine hyperparameter or recipe variation. Each proposal should be motivated by an explicit hypothesis about what is limiting current performance and how the proposed change could alter that limitation.
 
 In short, for medical tasks the biggest wins often come from:

@@ -1,0 +1,18 @@
+[project]
+name = "clinical-automata-webui-backend"
+version = "0.1.0"
+description = "Web UI backend for the clinical-automata CC-CLI harness (demo)"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "pyyaml>=6.0",
+    "itsdangerous>=2.2",
+    "python-multipart>=0.0.9",
+    "websockets>=12.0",
+]
+
+[tool.uv]
+package = false

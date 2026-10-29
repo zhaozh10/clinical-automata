@@ -1,6 +1,7 @@
 # Python-generated files
 __pycache__/
 *.py[oc]
+pretrained/
 build/
 dist/
 wheels/
@@ -11,6 +12,7 @@ wheels/
 *.ckpt
 projects/
 *.log
+analysis/
 *png
 *.tsv
 # Virtual environments

@@ -24,6 +24,7 @@ This is a **critical step**.
 
 ### Rules:
 - Please first determine the role of the doctor-requested model based on the task type: treat classification tasks as decision-making, and treat detection, segmentation, image-text retrieval, and similar supportive vision tasks as assistive. In many cases, doctors prefer assistive models to decision-making models. Therefore, for decision-making tasks, you should adopt a highly cautious stance, make conservative judgments, and avoid overconfident conclusions.
+- If the doctor is concerned with only a subset of classes, the training, validation, and test sets do not need to cover all available classes.
 - **Important!!!**. When only part of the dataset has full supervision for the main task, but additional samples have weaker or coarser labels related to the same clinical target, do not default to training only on the fully labeled subset. Explicitly consider whether the weaker labels can be used.
 - The agent must infer missing but clinically important metrics if not specified.
 - The selection of primary metric should be consistent with risk preference.
