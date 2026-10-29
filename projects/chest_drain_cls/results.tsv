@@ -1,0 +1,7 @@
+commit	sensitivity	auc	f1	specificity	precision	memory_gb	status	description	test_sensitivity	test_auc	test_f1	test_specificity	test_precision
+fc40fc2	0.9921	0.9886	0.8660	0.7548	0.7683	7.1	keep	baseline EfficientNet-B0 focal loss	0.9841	0.9874	0.8571	0.7979	0.7592
+3f460ce	1.0000	0.9858	0.7593	0.4806	0.6120	10.2	keep	ConvNeXt-Tiny backbone	1.0000	0.9892	0.6910	0.4212	0.5279
+5d65eee	1.0000	0.9944	0.7405	0.4258	0.5880	10.2	discard	ConvNeXt-Tiny freeze-unfreeze	nan	nan	nan	nan	nan
+a1ae26c	0.9843	0.9883	0.8787	0.7903	0.7937	10.4	discard	EfficientNet-B2 + AUC tiebreaker	nan	nan	nan	nan	nan
+51cce1c	nan	nan	nan	nan	nan	0.0	crash	label smoothing killed focal loss gradients	nan	nan	nan	nan	nan
+d25a0d7	1.0000	0.9997	0.9676	0.9452	0.9373	10.2	keep	ConvNeXt-Tiny LR=3e-5 + AUC tiebreaker	1.0000	0.9987	0.9643	0.9521	0.9310

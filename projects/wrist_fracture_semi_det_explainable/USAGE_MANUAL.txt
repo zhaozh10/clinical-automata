@@ -1,0 +1,134 @@
+================================================================================
+PAEDIATRIC WRIST-FRACTURE DETECTOR WITH BUILT-IN FRACTURE VISUALISATION
+Research artefact - not a clinical decision-making device.  See section 5.
+================================================================================
+
+1. WHAT IT DOES
+--------------------------------------------------------------------------------
+Input : one paediatric wrist radiograph (frontal or lateral view), 16-bit or
+        8-bit PNG, any size.  One film at a time; views are read independently.
+Output: (a) a fracture probability between 0 and 1
+        (b) an "evidence map" painted over the film showing where the finding is
+        (c) a box drawn around the fractured region, with its own confidence
+        (d) a machine-readable record of all of the above
+
+The point of the design is that (a) and (b) cannot disagree.  The model does not
+make a fracture/no-fracture judgement and then get asked to justify it.  It
+produces only the evidence map, and the overall probability is a fixed
+mathematical read-out of that map - essentially "how strong is the single
+strongest spot".  So the probability IS the highlighted region.  If the model
+calls a film fractured, something on that film is lit up, and that is what you
+are shown.  The box is read off the same map.
+
+2. HOW TO RUN IT
+--------------------------------------------------------------------------------
+From the repository root:
+
+  # new radiographs: put PNG files in one folder
+  uv run projects/20260910_09_wrist_fracture_det/predict.py --images /path/to/folder
+
+  # reproduce the sealed test-set evaluation reported below
+  uv run projects/20260910_09_wrist_fracture_det/predict.py --test
+
+For --images, results are printed per film and written to
+  /path/to/folder/predictions/report.json
+containing, for each film, the fracture probability and the marked region(s) as
+[x1, y1, x2, y2] in the ORIGINAL pixel coordinates of that film.
+
+For --test, outputs land in projects/20260910_09_wrist_fracture_det/ :
+  test_metrics.json      overall performance figures
+  test_predictions.csv   one row per film (see section 4)
+  test_report.json       per-film probability, marked regions, radiologist boxes
+  example_overlays/      24 sample pictures
+and all 3,932 full-size overlay pictures (2.8 GB) are written to
+  /path/to/your/external_data/gpwd_sep10_test_overlays/
+In an overlay, RED is the model's marked region and GREEN is the radiologist's.
+
+Model file: projects/20260910_09_wrist_fracture_det/run12/checkpoints/best.pth
+Operating threshold: 0.0614 (probability at or above this = "fracture").
+This threshold was chosen on the validation children only, never on the test set.
+
+3. WHAT IT WAS TRAINED ON
+--------------------------------------------------------------------------------
+GRAZPEDWRI-DX paediatric wrist radiographs, 6,091 children, ages 0.2-19 years.
+Children were split so that no child appears in more than one group:
+  training    3,898 children / 13,152 films
+  validation    974 children /  3,243 films  (used for all tuning decisions)
+  sealed test 1,219 children /  3,932 films  (opened once, at the very end)
+
+Only about 820 training films carried a radiologist-drawn outline of the
+fracture; the rest carried only a yes/no note.  The model learns precise
+localisation from the outlined films, learns "nothing anywhere" from every
+fracture-free film, and learns from the yes/no films through a rule that says
+"if this film is fractured, some location must light up" without being told
+which.  It is also taught to recognise four classes of fracture look-alike
+(laterality letter markers, metalwork/casts, periosteal reaction, and other
+bone/soft-tissue findings) so that it does not confuse them with fractures.
+
+4. PERFORMANCE ON THE SEALED TEST SET (3,932 films, 1,219 children)
+--------------------------------------------------------------------------------
+Measured once, after all development was finished.
+
+Primary measure - detection AND correct placement of the mark
+  fracture AP@0.5 (overlap >= 50% with the true fracture)      0.839
+  (validation value was 0.878; see the caveat in section 5)
+
+Telling fractured from non-fractured films
+  discrimination (AUC; 1.0 perfect, 0.5 coin-flip)             0.980
+  at the operating threshold 0.0614:
+    sensitivity (fractures correctly flagged)                  0.951   (2384/2508)
+    specificity (normal films correctly cleared)               0.924   (1316/1424)
+    positive predictive value                                  0.957
+    negative predictive value                                  0.914
+    missed fractures                                           124
+    false alarms                                               108
+
+Does it point at the right place?
+  hottest point falls inside the true fracture                 0.963
+  among flagged fractured films, mark overlaps the fracture    0.958
+  median overlap of the mark with the true fracture            0.748
+  detection sensitivity at 1 false mark per film               0.882
+  fracture-free films with no mark at all                      0.699
+  average marks per film: 0.39 (normal)   1.63 (fractured)
+
+By age
+  0-5 years    (n=259)   sensitivity 0.969   specificity 0.971
+  5-9 years    (n=883)   sensitivity 0.973   specificity 0.893
+  9-13 years  (n=1631)   sensitivity 0.946   specificity 0.946
+  13-20 years (n=1159)   sensitivity 0.923   specificity 0.906
+
+By view
+  frontal (n=1942)       sensitivity 0.944   specificity 0.919
+  lateral (n=1974)       sensitivity 0.956   specificity 0.929
+
+Missed fractures were usually missed with conviction: the median probability on
+the 124 missed films was 0.025, i.e. they did not sit just below the threshold.
+
+5. LIMITATIONS AND INTENDED USE
+--------------------------------------------------------------------------------
+* This is a research artefact. It is not a medical device, has no regulatory
+  clearance, and must not be used to make or withhold clinical decisions.
+* Single site, single dataset (Graz). Performance on other hospitals, other
+  X-ray equipment or other populations is unknown and would need separate
+  testing.
+* WRIST ONLY. It has never been shown any other body part. Given a film of
+  another region it will still output a number, and that number is meaningless.
+* Per-film, not per-patient. Frontal and lateral views are read independently
+  and are not combined, so the two views of one wrist may disagree.
+* Fracture presence only. It does not classify fracture type, AO grade,
+  displacement, angulation, age of the injury, or healing status.
+* The reference standard is one radiologist's reading recorded in the dataset,
+  not surgical or follow-up confirmation, and apparent false alarms are not
+  always errors.
+* The primary localisation figure is uncertain. It rests on a validation subset
+  containing only 139 outlined fractures; retraining the identical
+  configuration with a different random seed moved it from 0.878 to 0.830. The
+  sealed-test value of 0.839 sits inside that band. The film-level figures
+  (sensitivity, specificity, discrimination) are far more stable - they are
+  computed on thousands of films and varied by less than 0.01 between seeds.
+* The operating point favours sensitivity, as agreed for a missed-fracture-
+  averse setting. It produces roughly one false alarm per 13 normal films.
+* Accepting a mark as correct required 50% overlap with the radiologist's box.
+  A mark that lands on the fracture but is drawn larger or smaller counts as
+  wrong under that rule even though it would be clinically useful.
+================================================================================

@@ -1,0 +1,10 @@
+commit	segscore_all	dice_all	dice_hard	hd95n_hard	memory_gb	status	description
+c05813c	0.5413	0.6031	0.5828	1.9010	27.1	keep	baseline frozen DINOv3-L + conv decoder res768 fullimg (resolution-starved: head ~3 tokens)
+5644856	0.5733	0.6159	0.5974	1.8996	34.7	keep	res1024 + 4-layer multiscale fusion (small gain; per-head still ambiguous)
+1768e39	0.8700	0.9186	0.8859	0.1435	34.7	keep	bilateral 2-channel: beats baseline (Dice 0.919/0.886). Perthes 0.673 weak
+d1e0003	0.8598	0.9181	0.8879	0.1522	34.7	discard	Tversky b=0.7: Perthes up (0.737) but global recall push hurt NSD -> SegScore down
+d27157b	0.8805	0.9234	0.8933	0.1809	34.7	keep	boundary-weighted BCE: NSD up across cohorts, new best
+febd033	0.8723	0.9225	0.8943	0.1379	34.7	discard	balanced sampling: hard cohorts up but starved easy ones (NSD down) -> SegScore down
+6c43390	0.8777	0.9247	0.8934	0.2752	35.6	discard	image-stem decoder: best Dice but hurt NSD (metal edges from implants) -> SegScore down
+d27157b	0.8970	0.9280	0.9040	0.2020	34.7	keep	RUN5 on TEST set (seed0): beats baseline on ALL cohorts (Dice 0.928/0.904)
+215c564	0.897	0.928	0.906	0.202	34.7	keep	FINAL 3-seed test: Dice 0.928+/-0.002 ALL, 0.906 HARD; beats baseline all cohorts; ensemble 0.931

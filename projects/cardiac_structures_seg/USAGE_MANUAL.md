@@ -1,0 +1,198 @@
+# Herzhöhlen-Segmentierung am Thorax-Röntgenbild — Lehrwerkzeug
+
+Segmentierungsmodell für die Lehre: Herzhöhlen, herznahe Gefäße, Klappenebenen und
+randbildende Strukturen der Herzsilhouette — auf p.a./frontalen **und** seitlichen
+Projektionsaufnahmen.
+
+> Ergebnisse auf dem unabhängigen Testsatz: Abschnitt 4. Grenzen des Verfahrens:
+> Abschnitt 5 — bitte vor dem Einsatz lesen. Verlauf der Experimentreihe: `results.tsv`.
+
+---
+
+## 1. Was das Modell ausgibt
+
+Pro Aufnahme werden 21 Strukturen als **voneinander unabhängige** Masken vorhergesagt:
+
+| Gruppe | Strukturen |
+|---|---|
+| Herzhöhlen | linker/rechter Vorhof, linker/rechter Ventrikel, Myokard, Herz gesamt |
+| Herznahe Gefäße | Aorta ascendens, Aortenbogen, Aorta descendens, Truncus pulmonalis / zentrale Pulmonalarterien, gesamtes Pulmonalgefäßbett, V. cava inferior |
+| Kontext | Cardiomediastinum, Trachea, Bifurkation, rechte/linke Lunge (nur frontal) |
+| Klappenebenen | Mitral-, Trikuspidal-, Aorten-, Pulmonalklappe |
+
+**Wichtig:** die Masken überlappen sich absichtlich. Eine Projektionsaufnahme ist ein
+Summationsbild — der linke Ventrikel liegt im p.a.-Bild zu einem großen Teil *hinter*
+dem rechten Ventrikel. Das Modell gibt deshalb pro Struktur eine eigene Maske aus und
+nicht eine einzige Karte mit sich gegenseitig ausschließenden Regionen.
+
+### Wie stark überlagern sich die Höhlen tatsächlich?
+
+Aus der Referenzsegmentierung von je 400 Aufnahmen (`teaching_stats.json`):
+
+| | p.a. | seitlich |
+|---|---|---|
+| Anteil der Herzfläche mit ≥ 2 übereinanderliegenden Höhlen | **48 %** | **53 %** |
+| rechter Ventrikel ∩ linker Ventrikel | 64 % | 49 % |
+| rechter Ventrikel ∩ linker Vorhof | 73 % | **0 %** |
+| linker Ventrikel ∩ rechter Vorhof | **0 %** | 73 % |
+| Abstand der Klappenebenen (in Herzbreiten) | 0.25 | 0.32 |
+
+(Überlappung jeweils in % der kleineren der beiden Strukturen.)
+
+Das ist der didaktische Kern und lässt sich direkt zeigen: Fast die Hälfte der
+Herzsilhouette im p.a.-Bild besteht aus übereinander projizierten Höhlen. Was in der
+einen Ebene komplett überlagert ist, trennt sich in der anderen — rechter Ventrikel und
+linker Vorhof überlagern sich p.a. zu 73 %, seitlich gar nicht; für linken Ventrikel und
+rechten Vorhof gilt exakt das Umgekehrte. Auch die vier Klappenebenen liegen p.a. dicht
+beieinander und ziehen sich seitlich um ca. 30 % auseinander — deshalb ist die seitliche
+Aufnahme für die Klappenlokalisation lehrreicher.
+
+---
+
+## 2. Die fünf Lehrbilder
+
+Jede Auswertung erzeugt eine Bildtafel:
+
+1. **Summation / Überlagerung** — Farbcodierung, wie viele Herzhöhlen an einem Punkt
+   übereinander projiziert werden, plus Angabe, welcher Anteil der Herzfläche aus
+   überlagerten Höhlen besteht. Das ist der zentrale Punkt zur Projektionsradiographie.
+2. **Herzhöhlen (anterior → posterior)** — die vier Höhlen und die herznahen Gefäße
+   einzeln konturiert, in der Reihenfolge ihrer Lage von vorne nach hinten.
+3. **Klappenebenen** — die vier Klappenebenen als Kontaktzone der jeweils angrenzenden
+   Strukturen (z. B. Mitralklappe = Kontaktzone linker Vorhof/linker Ventrikel), mit
+   Schwerpunktmarkierung.
+4. **Randbildende Strukturen** — die Kontur der Herzsilhouette, Zeile für Zeile
+   eingefärbt nach der Struktur, die den Rand bildet. Seitlich stattdessen vordere und
+   hintere Herzkontur.
+5. **Messung** — Herz-Thorax-Quotient mit eingezeichneten Messstrecken, LV-Fläche und
+   LV-Anteil, jeweils gegen die Kohortenreferenz eingeordnet.
+
+Optional (`--atlas N`): **typische Klappenlage** — die Klappenschwerpunkte von N
+Trainingsfällen, normiert auf die Herzsilhouette, als Punktwolke mit ±1-SD-Ellipse.
+So wird sichtbar, wo die Klappenebene typischerweise liegt und wie stark sie streut.
+
+Seitliche Aufnahmen werden zur Anzeige gespiegelt (Patient blickt nach links), da die
+Originaldaten nach rechts blickend gerendert sind.
+
+---
+
+## 3. Bedienung
+
+```bash
+# Das ausgelieferte Modell ist ein Ensemble - Checkpoints kommagetrennt angeben:
+CKPT=projects/20260723_07_cardiac_structures_seg/run13/checkpoints/best.pth,projects/20260723_07_cardiac_structures_seg/run14/checkpoints/best.pth,projects/20260723_07_cardiac_structures_seg/run15/checkpoints/best.pth
+
+# Lehrbilder für eine Aufnahme aus dem Testsatz (Modellvorhersage)
+uv run visualize.py --checkpoint "$CKPT" --image <name>_frontal.png --atlas 250 --out <ordner>
+
+# dasselbe mit der Referenzsegmentierung statt der Modellvorhersage
+uv run visualize.py --gt --image <name>_frontal.png --split test --out <ausgabeordner>
+
+# eine Serie von Fällen über das Spektrum der Herzgröße (klein → groß)
+uv run visualize.py --checkpoint "$CKPT" --demo 8 --out <ausgabeordner>
+
+# eigenes / externes Röntgenbild (beliebiges PNG, wird auf 512x512 gebracht)
+uv run visualize.py --checkpoint "$CKPT" --real "/pfad/zu/bildern/*.png" --out <ordner>
+
+# vollständige Auswertung des Testsatzes + Masken + Fallliste
+uv run predict_test.py --checkpoint "$CKPT" --figures 12
+```
+
+Zu jedem frontalen Fall werden zusätzlich der Herz-Thorax-Quotient und die paarweisen
+Überlagerungsanteile der Höhlen ausgegeben.
+
+---
+
+## 4. Ergebnisse auf dem unabhängigen Testsatz
+
+2220 Aufnahmen von 1100 Patienten, die in keinem Trainings- oder Validierungsschritt
+vorkamen (Aufteilung patientenweise, frontale und seitliche Aufnahme desselben
+Patienten immer in derselben Gruppe). Ausgeliefert wird ein **Ensemble aus drei
+Modellen mit DINOv3-vortrainiertem Encoder** (Läufe 13, 14, 15).
+
+> Methodischer Hinweis: auf dem Validierungssatz erreicht dieses Ensemble 0.929, auf dem
+> Testsatz 0.918. Die Differenz ist Auswahlverzerrung — die Checkpoints wurden auf dem
+> Validierungssatz ausgewählt, und die Mittelung dreier so ausgewählter Modelle verstärkt
+> das. **Maßgeblich sind die Testwerte unten.**
+
+| Struktur / Größe | Wert |
+|---|---|
+| **Herzhöhlen (Mittel LA, RA, LV, RV)** | **0.918** |
+| linker Vorhof / rechter Vorhof | 0.916 / 0.914 |
+| linker Ventrikel / rechter Ventrikel | 0.922 / 0.921 |
+| Myokard | 0.931 |
+| Herzsilhouette gesamt | 0.959 |
+| Cardiomediastinum | 0.951 |
+| Aorta ascendens / Bogen / descendens | 0.890 / 0.872 / 0.895 |
+| Truncus pulmonalis (zentrale PA) | 0.830 |
+| V. cava inferior | 0.836 |
+| Trachea / Bifurkation | 0.919 / 0.874 |
+| Lunge rechts / links (nur frontal) | 0.957 / 0.955 |
+| Klappenebenen (Dice) Mitral / Trikuspidal / Aorten / Pulmonal | 0.869 / 0.867 / 0.767 / 0.726 |
+| **Klappenlokalisation (Abstand der Schwerpunkte)** | Mitral 4.7 px · Trikuspidal 5.7 px · Aorten 4.8 px · Pulmonal 10.6 px |
+| **Randbildende Struktur korrekt zugeordnet** | 85.5 % aller Konturzeilen |
+| **Herz-Thorax-Quotient, mittlerer absoluter Fehler** | 0.010 (systematischer Fehler −0.001) |
+| Herzhöhlen bei verbreiterter Silhouette (n = 316) | 0.907 |
+| Herzhöhlen bei normaler Silhouette | 0.926 |
+| Herzhöhlen bei LV-betonten Herzen (n = 96) | 0.884 (LV selbst 0.919) |
+
+Bei 512 px Bildbreite auf ca. 40 cm Bildfeld entspricht 1 px ≈ 0.8 mm; die
+Klappenlokalisation liegt also bei ~4 mm (Mitral/Aorten) bis ~9 mm (Pulmonal).
+
+---
+
+## 5. Grenzen — bitte vor dem Einsatz in der Lehre lesen
+
+**1. Die Referenzsegmentierung stammt aus CT, nicht aus dem Röntgenbild.**
+Herzhöhlen lassen sich auf einer Projektionsaufnahme gar nicht direkt annotieren — der
+Datensatz (PAXRay++) erzeugt daher digital rekonstruierte Radiographien aus CT-Volumina
+und projiziert die CT-Segmentierung mit. Das ist die einzige Möglichkeit, überhaupt
+Höhlen-Labels zu bekommen, bedeutet aber: die Bilder sind **keine echten Filmaufnahmen**.
+Auf realen Röntgenbildern ist die Genauigkeit **nicht quantifiziert** (dafür existiert
+keine Referenz) — sie kann dort niedriger sein.
+
+*Qualitative Prüfung:* auf echten Aufnahmen aus ChestX-ray14 (u. a. AP-Liegendaufnahmen)
+liefert das Modell anatomisch plausible Überlagerungen; Herzkontur, Höhlenlage und
+Randzuordnung entsprechen dem erwarteten Muster (Beispiele in `real_cxr/`). Das ist ein
+Augenschein-Befund, **kein Genauigkeitsnachweis** — für die Lehre am realen Bild sollte
+die Überlagerung deshalb immer gemeinsam mit dem Originalbild beurteilt werden.
+
+**2. Die Projektionsgeometrie ist nicht die einer p.a.-Aufnahme im Stehen.**
+Der Herz-Thorax-Quotient ist in dieser Kohorte systematisch größer (Median 0.51), der
+klassische Grenzwert 0.50 trennt hier nicht — 56 % der Fälle lägen darüber. Das Werkzeug
+ordnet deshalb **kohortenrelativ** ein (p90 = 0.60 als „deutlich verbreitert"). Absolute
+CTR-Werte aus diesem Werkzeug sind nicht auf Ihre Stationsaufnahmen übertragbar; das
+Verhältnis der Strukturen zueinander schon.
+
+**3. Die Kohorte ist keine Normalpopulation.**
+Zugrunde liegen CT-Untersuchungen bei Lungenembolie-Abklärung, Rippenfrakturen und
+COVID-19 — überwiegend akut kranke, oft liegende Patienten.
+
+**4. Die V. cava superior fehlt im Labelsatz.**
+Die obere rechte Herzkontur wird daher der Aorta ascendens bzw. dem Cardiomediastinum
+zugeschlagen. Beim Besprechen der randbildenden Strukturen muss die VCS ergänzt werden.
+
+**5. Die Klappenebenen sind abgeleitet, nicht annotiert.**
+Sie werden als Kontaktzone der beiden angrenzenden Strukturen berechnet (Mitralklappe =
+Kontakt linker Vorhof/linker Ventrikel usw.). Sie zeigen also die **Ebene und typische
+Lage** der Klappe, nicht die Klappe selbst. Die Pulmonalklappe ist am ungenauesten
+(~9 mm), weil die Kontaktzone zwischen rechtem Ventrikel und Truncus pulmonalis am
+variabelsten ist.
+
+**6. Höhlengrenzen sind im Bild teilweise gar nicht abgebildet.**
+Wo zwei Höhlen übereinanderliegen, gibt es im Summationsbild keine Kante — das Modell
+ergänzt dort Formwissen aus dem Training. Für die Lehre ist genau das der Punkt; als
+**Messinstrument für einzelne Höhlengrößen ist es nicht validiert**.
+
+**7. Bei vergrößerten Herzen etwas ungenauer** (0.902 statt 0.922) — also gerade in den
+Fällen, die didaktisch interessant sind. Die Erkennung der Verbreiterung als solche ist
+davon nicht betroffen (CTR-Fehler 0.010), wohl aber die exakte Höhlenabgrenzung.
+
+**8. Die Streuung zwischen Trainingsläufen liegt bei ~0.003 Dice.**
+Zwei identisch konfigurierte Läufe mit unterschiedlichem Zufallsstartwert ergaben 0.916
+und 0.919. Unterschiede dieser Größenordnung zwischen Modellvarianten sind daher nicht
+interpretierbar; nur die Mittelung mehrerer Modelle (Ensemble) lag reproduzierbar darüber.
+
+**9. Kein diagnostisches Werkzeug.** Für die Frage nach tatsächlicher Kammervergrößerung
+bleiben Echokardiographie bzw. CT maßgeblich. Dieses Modell ist ein Lehrmittel zur
+Veranschaulichung von Projektion, Klappenlage, Randbildung und Herzgröße.

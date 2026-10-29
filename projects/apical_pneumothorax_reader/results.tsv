@@ -1,0 +1,31 @@
+commit	apex_ap	apex_auc	recall_at_ppv50	ppv_at_op	alerts_per_100_films	film_recall	fp_zones_per_100_neg_films	seg_dice	memory_gb	status	description
+b0e3a3e	0.4156	0.8544	0.3743	0.5000	6.92	0.3975	3.61	0.0000	5.3	keep	baseline Unet-resnet34 512 BCE+Dice topk pooling; unstable - collapses to empty mask after ep9
+738e43f	0.5565	0.8863	0.6550	0.5045	12.00	0.6770	6.45	0.3188	5.3	keep	dice on positive films only + cosine LR; fixes empty-mask collapse (30min budget)
+0efb9e5	0.6084	0.9074	0.6725	0.5088	12.22	0.6894	6.51	0.3933	5.3	keep	same recipe at 40min budget - reference for the 40min family
+7197ade	0.5751	0.8880	0.5965	0.5231	10.54	0.6211	5.39	0.3997	5.4	discard	2-GPU DDP ~100 epochs; no gain over run3 - now overfitting not compute limited
+6f4d2b7	0.7009	0.9464	0.7544	0.5000	13.95	0.7578	7.28	0.3761	5.3	keep	per-side apical crop 2x magnification + mirrored left apex - large gain
+dd9115d	nan	nan	nan	nan	nan	nan	nan	nan	0.0	discard	aborted early - 2 GPUs gave no speedup on the crop pipeline (dataloader bound)
+55ddfca	0.7115	0.9543	0.7661	0.5000	14.16	0.7764	7.52	0.3799	5.3	keep	same recipe on pre-cut crops - repeat of run5 within noise (run-to-run spread ~0.01)
+f450ed7	0.6439	0.9469	0.7661	0.5481	12.92	0.7764	6.28	0.3546	5.4	discard	1:1 ChestX-ray14 negatives - cleaner alerts (ppv .55 vs .50) but far fewer SIIM passes; net worse
+f5c1519	0.6922	0.9460	0.7661	0.5058	14.00	0.7764	7.22	0.4291	5.5	discard	GPU augmentation + 2 GPUs (~64 passes vs 35): no gain - saturated on compute not data
+48ba2fe	0.6687	0.9459	0.7427	0.5336	12.86	0.7516	6.39	0.3420	5.5	discard	ChestX-ray14 negatives at matched SIIM exposure - still worse; quieter (ppv .53) but less discriminative
+4a30903	0.7243	0.9639	0.8246	0.5090	14.97	0.8323	7.70	0.4150	5.4	keep	auxiliary per-apex classification head blended with pooled map - best so far; recall .766->.825
+7ca071d	0.6879	0.9373	0.7719	0.5323	13.41	0.7764	6.57	0.3906	8.9	discard	ConvNeXt-tiny encoder - no gain over resnet34; capacity is not the limit
+6f16683	0.7229	0.9497	0.7836	0.5560	13.03	0.7950	6.04	0.2898	5.4	keep	3x device-bearing normal apices - same AP as run11 but cleaner alerts (ppv .556 fp 6.0 vs .509 7.7)
+f3e40a9	0.7320	0.9570	0.7836	0.5019	14.43	0.7950	7.52	0.3476	5.5	keep	exponential moving average of weights - best so far; recall_at_ppv70 .714
+48d502b	0.6344	0.9419	0.6901	0.5064	12.59	0.6957	6.51	0.4070	5.5	discard	contralateral apex as 2nd channel - clearly worse; the two sides are not registered
+7aab9eb	0.7343	0.9588	0.8129	0.5129	14.65	0.8199	7.52	0.3421	5.5	keep	test-time averaging over 5 views - best so far; higher at every checkpoint than run14
+d46754b	0.7474	0.9601	0.8246	0.5018	15.19	0.8385	7.87	0.3640	5.5	keep	per-apex head weight 1.0 used directly as the alert score - best so far
+539ef89	0.7361	0.9643	0.8246	0.5127	14.86	0.8385	7.52	0.3790	5.5	discard	stronger augmentation + block dropout - best AUC and r@ppv70 but primary metric slightly lower
+cb141fb	0.7449	0.9683	0.8363	0.5035	15.35	0.8509	7.87	0.3761	5.5	discard	3x positive apices - peaks early (ep13) then overfits; ties run17 on the primary metric
+d2dfdef	0.7376	0.9608	0.8246	0.5127	14.86	0.8385	7.40	0.3435	5.5	discard	heavier weight decay + head dropout - no gain over run17
+ddcdebd	0.7273	0.9615	0.7953	0.5056	14.54	0.8075	7.46	0.3788	5.5	discard	seed repeat of run17 - 0.727 vs 0.747; run-to-run spread on validation is about 0.02
+d2a6d33	0.6913	0.9603	0.7895	0.5019	14.54	0.8012	7.64	0.0000	1.8	discard	classifier only - overfits badly; the pixel-level branch is a useful auxiliary signal
+6a0c2ab	0.7361	0.9618	0.8538	0.5087	15.51	0.8696	8.05	0.3437	5.5	discard	wider apical crop (margin .55) - within seed noise of run17, best film recall .870 though
+7f747c9	0.6670	0.9558	0.7368	0.5000	13.62	0.7453	7.16	0.3555	5.5	discard	encoder pre-trained on ChestX-ray14 apical crops - worse than ImageNet init (noisy film-level pretext)
+b0a70d7	0.7391	0.9612	0.7953	0.5000	14.70	0.8075	7.70	0.3628	10.7	discard	batch 32 with matched LR - within seed noise of run17
+90d7d37	0.7337	0.9621	0.8304	0.5035	15.24	0.8447	7.82	0.3887	5.5	discard	focal loss on the per-apex head - within seed noise, no gain
+8eceee1	0.7371	0.9665	0.7895	0.5094	14.32	0.8012	7.28	0.3461	5.5	discard	mixup between apex crops - best AUC .9665 but primary metric within noise of run17
+77210f2	0.7321	0.9562	0.7895	0.5094	14.32	0.8012	7.40	0.3594	5.6	discard	auxiliary lung-field outlining - within seed noise, no gain
+da5c12c	0.7498	0.9586	0.8363	0.5071	15.24	0.8509	7.82	0.3508	5.5	keep	slower weight averaging (0.9995) - best overall; recall_at_ppv70 .743 film_recall .851
+0c8da84	0.7431	0.9619	0.8187	0.5128	14.76	0.8323	7.46	0.3997	5.5	keep	third seed of the final configuration - 0.743 vs 0.750; configuration confirmed

@@ -1,0 +1,12 @@
+commit	dice_heart	dice_frontal	dice_lateral	iou_heart	hd95_heart	dice_chambers	memory_gb	status	description
+dcdd9bb	0.9470	0.9553	0.9387	0.9008	10.59	0.8930	9.6	keep	baseline: xraydino ViT-L/16 frozen + conv decoder, 1.8M trainable, bs16 lr3e-4
+b3d0f13	0.9503	0.9586	0.9420	0.9065	9.66	0.9000	15.1	keep	finetune last 8 encoder blocks @0.1x lr; +0.0033 over baseline, HD95 10.6->9.7
+e9ce4ff	0.9493	0.9577	0.9408	0.9047	9.83	0.8982	15.1	keep	strong domain randomization; DRR -0.001 (noise) but real-film +0.0018 paired p<1e-4 (0.898->0.900); kept for real-film goal
+ac0d710	0.9487	0.9574	0.9399	0.9036	9.96	0.8975	15.7	discard	hi-res conv-stem skip; HD95 9.83->9.96 (worse) DRR -0.0006; boundary-bottleneck hypothesis falsified
+a5fc3ca	0.9451	0.9539	0.9363	0.8976	10.91	0.8898	9.6	discard	frozen encoder+strong aug; WORSE on both DRR (-0.0042) and real-film (-0.0013 p<0.001); finetuning does NOT erode real-film prior -> DRR metric is aligned with goal
+8173794	0.9488	0.9561	0.9414	0.9035	NA	0.8978	27.4	discard	bs32 + scaled LR; tied run3 (-0.0005), did not fix undertraining, 2x memory
+4c1b031	0.9542	0.9607	0.9478	0.9133	8.84	0.9073	17.8	keep	finetune last 12 blocks; NEW BEST +0.0049 over run3, HD95 9.83->8.84
+1c8d9dd	0.9599	0.9653	0.9546	0.9236	7.96	0.9176	27.8	keep	full finetune 24 blocks; NEW BEST DRR +0.0057, HD95 8.84->7.96; real-film 0.901 (plateau)
+1c8d9dd	0.9583	0.9614	0.9552	0.9210	8.12	0.9165	27.8	discard	full ft + elastic warp; DRR -0.0016, real-film mean & p10 & tail ALL unchanged; confirms CheXmask ceiling not a robustness gap
+f289386	0.9599	0.9653	0.9549	NA	NA	NA	27.8	discard	enc_lr_mult 0.1->0.2; identical to run8 (0.9599), 0.1 already sufficient
+f289386	0.9596	0.9662	0.9530	NA	NA	NA	29.2	discard	weight EMA (decay 0.999); tied run8 (-0.0003), no gain (cosine->0 makes EMA~last iterate)

@@ -45,6 +45,7 @@ Under the hood, the three roles are played by a coding agent (Claude Opus 4.6 in
   clinical-automata/
   ├── README.md                        # This file
   ├── asset/                           # Figures used in README
+  ├── projects/                        # Projects shown in the paper: agent code, run logs, manuals, checkpoint links
   └── src/
       ├── clinical-automata-backend/   # The agent harness
       │   ├── Parser.md                # Semantic parser prompt: clinician request → structured task spec
@@ -119,6 +120,12 @@ cp src/config.env.example src/config.env   # src/config.env is git-ignored
 | `VITE_CONTACT_EMAIL` | `your-email@example.com` | Contact address shown to users in the web UI (all languages). |
 
 Environment variables with the same name override the file.
+
+---
+
+## Projects
+
+The projects shown in the paper are in [`projects/`](projects/). For each one we release the code the agent wrote, its run log (`results.tsv`), the usage manual where available, and a download link for the best checkpoint.
 
 ---
 

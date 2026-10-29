@@ -1,0 +1,124 @@
+PENGWIN 2026 Task 1 — peripelvic fracture fragment segmentation
+Research artefact.  NOT a clinical decision-making device.
+Built 2026-09-14.  Branch automata/sep12, project projects/20260912_15_pelvic_ct_fragment_seg.
+
+====================================================================
+1. WHAT THIS MODEL DOES
+====================================================================
+Input :  one pelvic or femoral CT scan (MetaImage .mha, any dimensions
+         and voxel spacing).
+Output:  one .mha segmentation with EXACTLY the same dimensions, voxel
+         spacing and position as the input, in which every individual
+         bone fracture fragment carries its own number:
+
+             0         background
+             1  - 50   sacrum fragments
+             51 - 100  left hipbone fragments
+             101 - 150 right hipbone fragments
+             151 - 200 femur fragments
+
+         Fragments are numbered consecutively inside each bone's range.
+         Fragments smaller than 500 mm3 are deliberately NOT produced:
+         the challenge scoring rule excludes them, so predicting them
+         only creates false findings.
+
+The model answers: "which separate pieces of bone are present in this
+injured pelvis or femur, and which bone does each piece belong to?"
+It does not grade the fracture, does not plan a reduction, and does not
+say whether an operation is needed.
+
+====================================================================
+2. HOW TO RUN IT ON NEW DATA
+====================================================================
+One-off, for a new scan collection:
+
+  # 1. preprocess into the working cache (about 0.8 s per scan)
+  uv run data.py --build-cache --workers 10
+  uv run data.py --build-coarse
+
+  # 2. run the model
+  uv run train.py --finalize \
+      --ckpt projects/20260912_15_pelvic_ct_fragment_seg/ensemble/checkpoints/best.pth \
+      --gpu 0 --shard 0 --nshard 1 \
+      --outdir <output directory> --split test
+
+Segmentations land in <output directory>/masks/<case-id>.mha and a
+per-case score file in <output directory>/test_rows_0.json.
+Two GPUs can be used by launching --shard 0 and --shard 1 with
+--nshard 2.
+
+Runtime: about 20 s per scan on one NVIDIA L40S (this is a 15-model
+ensemble; a single model takes about 3 s but scores about 0.06 lower).
+Peak graphics memory about 10 GB.
+
+====================================================================
+3. PERFORMANCE ON THE HELD-OUT TEST SET
+====================================================================
+51 scans that took no part whatsoever in training, in choosing
+between model versions, or in tuning any setting.  They were used once,
+after all development was finished.
+
+MAIN MEASURE — fragment-level agreement
+  For every true fragment of at least 500 mm3 the model's best matching
+  predicted fragment is found (one-to-one matching).  Each matched pair
+  contributes how much the two overlap, on a 0-1 scale.  Missed true
+  fragments and invented extra fragments both count as zero.
+
+    all scans          0.764
+    pelvic scans       0.777   (26 scans)
+    femoral scans      0.750   (25 scans)
+
+  Measured on the original scan resolution instead of the 1 mm working
+  grid the figures are 0.766 / 0.781 / 0.752.
+
+SUPPORTING MEASURES (all scans)
+  fragments found                 80.7 %   (221 of 274)
+  overlap of the found fragments  0.917
+  invented extra fragments        17 across all 51 scans
+  fragment-count error            0.63 per bone on average
+  surface distance                0.70 mm on matched fragments
+
+  Telling the bones apart (sacrum / left hip / right hip / femur),
+  ignoring the split into fragments:
+    sacrum 0.966   left hipbone 0.978   right hipbone 0.976   femur 0.980
+
+  Recognising whether a scan is a pelvic or a femoral study: 100 %.
+
+WHERE IT FAILS
+  The five weakest scans of the 51:
+    416 (femur): agreement 0.33, found 2 of 5 fragments
+    316 (femur): agreement 0.49, found 2 of 4 fragments
+    420 (femur): agreement 0.49, found 1 of 2 fragments
+    258 (femur): agreement 0.51, found 3 of 4 fragments
+    408 (femur): agreement 0.59, found 4 of 5 fragments
+
+====================================================================
+4. LIMITATIONS AND INTENDED USE
+====================================================================
+* Trained on 238 scans, tuned on 51, tested on 51.  All 340 come
+  from the PENGWIN 2026 public training release.  Performance on scans
+  from other hospitals, other scanners or other reconstruction kernels
+  is unknown.
+* The competition's own 160-scan test set is not public, so these
+  numbers CANNOT be compared with any published leaderboard entry.
+* Telling which bone is which is close to solved (agreement 0.97-0.98).
+  Essentially all remaining error is in separating the fragments inside
+  one bone, and mostly in FINDING them: about one fragment in five is
+  still missed.  A missed fragment usually means two adjacent pieces
+  were merged into one.
+* Fragments below 500 mm3 are not produced at all.  In the training
+  data 22 % of annotated fragments are below that size, so small chips
+  will be absent from the output.  If those matter clinically, this
+  model is the wrong tool.
+* Femoral studies label only the injured femur.  If a scan shows two
+  femurs the model is expected to output only the fractured one; it was
+  never tested on a scan with two fractured femurs.
+* Numbers written back onto the original scan resolution lose about
+  1.5 % of agreement purely from resampling; putting the ground truth
+  itself through the same path scores 0.987, which is the ceiling for
+  any figure quoted on the original grid.
+* Each 60-minute training run reaches roughly 14 % of the training
+  volume that the reference nnU-Net recipe would use.  A longer compute
+  budget would very likely improve these results further.
+* Research artefact only.  Not validated for clinical use, not a
+  medical device, and not to be used to guide patient care.

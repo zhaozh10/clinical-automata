@@ -1,0 +1,22 @@
+commit	frag_dice	frag_dice_pelvic	frag_dice_femur	count_mae	assd_mm	sem_dice_mean	memory_gb	status	description
+88e6d7e	0.3579	0.4757	0.2447	2.098	4.465	0.9662	11.2	keep	baseline 3D UNet sem+contact-surface heads 128cubed 1mm region-conditioned
+eb36e1f	0.5327	0.6575	0.4128	1.451	3.460	0.9705	6.8	keep	channels-last 2.6x more steps + min frag 500mm3 and cs_tau 0.3 from offline sweep
+5a4f4c1	0.4474	0.5986	0.3020	1.516	2.984	0.9611	6.8	discard	3x contact-surface loss + 50pct interface patches - worse at every threshold
+ab4e1d2	0.6447	0.6926	0.5988	1.072	1.363	0.9712	6.8	keep	marker-based watershed decode with per-bone marker depth (pelvis 2mm femur 5mm)
+3c8f2a9	0.6867	0.7329	0.6422	0.895	1.343	0.9726	6.9	keep	deep supervision on 2 coarser decoder levels + cs_tau 0.05
+7d2b4e8	0.6802	0.7418	0.6210	0.868	1.331	0.9721	6.9	discard	rotation+scale aug - helps pelvis slightly but hurts femur (long-axis prior destroyed)
+a91c3f5	0.6697	0.7207	0.6206	1.052	1.165	0.9731	7.0	discard	learned fragment-depth head - hurts as aux task (0.670 vs 0.698) and its learned decode is worse still (0.631)
+f4a0c17	0.6458	0.7189	0.5755	1.150	1.195	0.9722	6.9	discard	LR 2e-3 instead of 1e-3 - worse at both evals, model is not LR-limited
+56cd170	0.6436	0.6861	0.6026	1.072	1.232	0.9712	14.1	discard	wider net base 48 - 2.25x params but 40pct fewer steps; steps win at this budget
+3e8b5c2	0.6792	0.7224	0.6376	1.124	1.282	0.9726	6.9	discard	per-region output heads - best mid-run so far but plateaus lower (0.679 vs 0.698)
+e924d5f	0.6819	0.7251	0.6403	1.026	1.236	0.9727	6.9	keep	seed repeat of run5 recipe - measures the run-to-run noise floor at 0.016
+469230a	0.6616	0.7339	0.5920	1.0980	1.3703	0.9726	6.9	keep	ensemble member seed 20260914
+23d4229	0.6567	0.6925	0.6223	1.0458	1.3165	0.9726	6.9	keep	ensemble member seed 20260915 region-heads
+00c2e7f	0.6641	0.7260	0.6046	0.9477	1.4917	0.9726	6.9	keep	ensemble member seed 20260916
+00c2e7f	0.6847	0.7201	0.6506	0.9150	1.5040	0.9726	6.9	keep	ensemble member seed 20260917 region-heads
+00c2e7f	0.6847	0.7231	0.6477	1.0588	1.2717	0.9726	6.9	keep	ensemble member seed 20260918 affine-aug
+00c2e7f	0.6757	0.7363	0.6173	1.3007	1.2504	0.9726	6.9	keep	ensemble member seed 20260919
+00c2e7f	0.6872	0.7186	0.6570	1.0392	1.4766	0.9726	6.9	keep	ensemble member seed 20260920 region-heads
+00c2e7f	0.6914	0.7343	0.6501	1.0523	1.2115	0.9726	6.9	keep	ensemble member seed 20260921 affine-aug
+00c2e7f	0.6868	0.7520	0.6241	1.0327	1.0332	0.9726	6.9	keep	ensemble member seed 20260922
+00c2e7f	0.7373	0.7663	0.7094	-	-	0.9726	9.5	keep	FINAL: 15-member ensemble, watershed depth re-tuned (pelvis 1mm femur 3mm)

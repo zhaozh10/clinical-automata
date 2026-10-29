@@ -1,0 +1,25 @@
+commit	mAP50	mAP50-95	recall	precision	f1	memory_gb	status	description	test_mAP50	test_mAP50-95	test_recall	test_precision	test_f1
+8fb0a96	0.5817	0.2836	0.5062	0.7297	0.5977	13.2	keep	baseline YOLOv8m 48ep	0.7453	0.3427	0.6276	0.8549	0.7238
+cff5d0b	0.6905	0.3511	0.5679	0.8628	0.6850	7.2	keep	4xGPU batch64 200ep (exceeded budget)	0.8161	0.4511	0.6853	0.9001	0.7781
+82bfb75	0.6146	0.3097	0.5863	0.7314	0.6508	7.2	keep	4xGPU batch64 90ep fixed DDP	0.7675	0.3857	0.6386	0.8208	0.7183
+43faeb3	0.6430	0.2970	0.5556	0.8222	0.6631	7.2	discard	110ep same config	nan	nan	nan	nan	nan
+ee46890	nan	nan	nan	nan	nan	0.0	crash	YOLOv8l 1024px NaN divergence	nan	nan	nan	nan	nan
+4ffa0be	nan	nan	nan	nan	nan	0.0	crash	neg ratio 2:1 but stale YOLO dir (300ep on full set exceeded budget)	nan	nan	nan	nan	nan
+c3bc4aa	0.5149	0.2426	0.4559	0.6523	0.5367	2.9	discard	YOLOv8m 1024px 60ep	nan	nan	nan	nan	nan
+18c1212	0.7597	0.3904	0.6147	0.8163	0.7013	1.2	keep	neg ratio 2:1 clean rebuild 80ep	0.7854	0.3953	0.6829	0.8293	0.7490
+91f758e	0.7846	0.4061	0.7044	0.8358	0.7645	4.0	keep	pseudo-labels (126 of 7637 used due to bug)	0.8234	0.4209	0.7212	0.8592	0.7841
+0b7222f	0.8978	0.6283	0.7968	0.9558	0.8691	4.0	discard	6482 pseudo but 0 real bbox in train + exceeded budget	nan	nan	nan	nan	nan
+918a615	0.8409	0.5864	0.7394	0.8956	0.8101	4.0	keep	stratified split 425 real+6192 pseudo 50ep	0.8643	0.4765	0.7753	0.8853	0.8266
+65ece8c	0.8692	0.6295	0.7676	0.9005	0.8288	4.0	keep	90ep 70min budget	0.8638	0.4926	0.7619	0.8934	0.8225
+7d7b223	0.8608	0.6172	0.7676	0.8702	0.8157	4.0	discard	iterative pseudo with run13 teacher (noisier)	nan	nan	nan	nan	nan
+934695d	0.8319	0.5811	0.7182	0.9358	0.8127	4.0	discard	conf 0.7 + mixup 0.15 (underfit)	nan	nan	nan	nan	nan
+7c634b5	0.8311	0.5848	0.7183	0.9014	0.7995	4.0	discard	imgsz 768 70ep (fewer epochs hurt)	nan	nan	nan	nan	nan
+8d6e20f	0.8268	0.5484	0.6665	0.8959	0.7644	4.0	discard	cosine LR + freeze10 + lr0=0.005 (constrained)	nan	nan	nan	nan	nan
+0b177c2	0.8692	0.6295	0.7676	0.9005	0.8288	4.0	discard	copy-paste 0.3 (identical to run13)	nan	nan	nan	nan	nan
+5e1078f	0.8254	0.5927	0.7042	0.8865	0.7849	4.0	discard	YOLOv8x 65ep (underfit larger model)	nan	nan	nan	nan	nan
+87055ec	0.8454	0.6182	0.7465	0.8812	0.8083	4.0	discard	multi-scale 0.5 + close_mosaic 20	nan	nan	nan	nan	nan
+4fab60f	0.8735	0.6252	0.7387	0.9545	0.8328	4.0	keep	110ep label_smoothing=0.05 stronger aug	0.8661	0.4928	0.7640	0.9024	0.8275
+015674c	0.8592	0.6214	0.7459	0.9059	0.8182	4.0	discard	NEG_RATIO=1.0 (fewer negs didnt help)	nan	nan	nan	nan	nan
+2dc5742	0.8615	0.6060	0.7606	0.9341	0.8384	4.0	discard	YOLO11m (slower and no improvement)	nan	nan	nan	nan	nan
+5905f75	0.8325	0.5516	0.7449	0.8477	0.7930	4.0	discard	two-phase train (real then pseudo)	nan	nan	nan	nan	nan
+507c672	0.8734	0.6118	0.7394	0.9315	0.8244	4.0	discard	run21 teacher conf 0.6 (no gain larger dataset slower)	nan	nan	nan	nan	nan

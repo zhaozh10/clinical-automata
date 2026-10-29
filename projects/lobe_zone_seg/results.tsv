@@ -1,0 +1,17 @@
+commit	mean_dice	lobe_dice zone_dice mean_iou ece brier memory_gb	status	description
+ddfde72	0.9247	0.9332 0.9175 0.8602 0.016 0.024 10.7	keep	baseline: pretrained resnet34 U-Net, BCE+Dice, MC-dropout head, 512px, 13 epochs (I/O-bound)
+9134988	0.9285	0.9361 0.9222 0.8669 0.0138 0.0229 10.7	keep	cache + cosine LR over budget; zones improved 0.9175->0.9222
+58f... 	0.7470	0.8370 0.6720 0.618 0.1386 0.0976 10.5	discard	efficientnet-b4 too slow at 512px (1578s/epoch, only 2 epochs, undertrained)
+f3a...	0.9213	0.9285 0.9153 0.8545 0.0118 0.025 30.4	discard	resnet50 undertrains in budget (9 epochs); capacity not the bottleneck
+2b1...	0.8238	0.8414 0.8090 0.7069 0.1415 0.0775 10.9	discard	channels_last catastrophically slow here (1657s/epoch); reverted
+e4c...	0.9109	0.9172 0.9056 0.8366 0.0092 0.0282 11.3	discard	EMA decay .999 lags in 14-epoch budget (underconverged); best ECE though
+9a07294	0.9303	0.9378 0.9240 0.8699 0.0147 0.0222 10.7	keep	peak LR 5e-4 (was 3e-4); underconverged before; all classes up
+8e4tie	0.9304	0.9373 0.9246 0.8699 0.0159 0.0221 10.7	discard	LR 8e-4 ties 5e-4 (0.9303); LR saturated, keep simpler 5e-4
+unetpp	0.9286	0.9342 0.9240 0.867 0.012 0.0225 13.3	discard	Unet++ only fits 8 epochs; worse than plain Unet (0.9303)
+1d8c383	0.9313	0.9395 0.9244 0.8717 0.0163 0.0218 10.7	keep	dropout 0.2->0.1; converges further; new best
+b48	0.9305	0.9396 0.9229 0.8703 0.0154 0.0217 14.9	discard	batch48/LR7e-4 slightly worse than batch24 (0.9313)
+wd3e5	0.9310	0.9392 0.9242 0.8712 0.016 0.0217 10.7	discard	WD 3e-5 ties 1e-4 (0.9313); keep 1e-4
+tversky	0.9299	0.9376 0.9235 0.8693 0.0146 0.0212 10.7	discard	BCE+Tversky worse for macro Dice (0.9313); best Brier though
+dff663f	0.9325	0.9401 0.9261 0.8738 0.0164 0.0213 10.7	keep	lighter aug (rot+-5, no shift); faster convergence; new best
+minaug	0.9300	0.9375 0.9238 0.8694 0.0175 0.0225 10.7	discard	minimal (intensity-only) aug overfits vs light (0.9325)
+lr6e4	0.9318	0.9398 0.9253 0.8727 0.0168 0.0215 10.7	discard	LR6e-4+light aug < LR5e-4 (0.9325); LR5e-4 optimal

@@ -1,0 +1,28 @@
+commit	fracture_ap50	auc	sensitivity	specificity	f1	loc_hit_rate	froc_sens1fp	memory_gb	status	description
+4785fdf	0.8264	0.9706	0.9136	0.9636	0.9463	0.9223	0.8849	5.9	keep	baseline: resnet34-FPN evidence map stride8 + MIL pooling + dense negatives; const LR
+5853fe1	0.8246	0.9712	0.9186	0.9330	0.9419	0.9612	0.8633	5.9	keep	cosine LR over wall-clock budget; AP tie within noise (+-0.05) but better late AUC and loc_hit_rate 0.92->0.96
+32024ba	0.7971	0.9792	0.9413	0.9550	0.9592	0.9515	0.8705	6.0	keep	EMA weight averaging: AP trace now smooth (was +-0.1 jitter); best AUC 0.979 sens 0.941 loc 0.981. lower peak AP is loss of noise spikes not of model quality - kept for measurable comparisons
+b13b2c3	0.8097	0.9746	0.9386	0.9474	0.9560	0.9126	0.8777	6.0	keep	dense FCOS LTRB + GIoU box loss replaces single-cell wh L1: +0.013 AP vs run3 and much faster early convergence (0.76 vs 0.67 at 120s)
+459432b	0.8009	0.9763	0.9190	0.9579	0.9479	0.9126	0.8849	6.2	discard	pseudo-box self-training (7837/8407 weak positives labelled, 9519 boxes): removes the late-run AP decay but does not raise the peak; -0.009 primary, more complexity
+3f9c935	0.7755	0.9732	0.9181	0.9455	0.9445	0.9320	0.8777	14.6	discard	stride-4 evidence map: denser grid yields more spurious peaks; AP -0.034 and FROC 0.88->0.76 with steep late decay
+2ab98ca	0.8469	0.9769	0.9340	0.9445	0.9529	0.9417	0.8921	6.0	keep	concentration penalty on weak positives (suppress all but top-2 peaks): BEST +0.037 vs run4 and +0.021 vs baseline; whole trajectory lifted not a spike; FROC best 0.892
+a4eedaf	0.8127	0.9753	0.9263	0.9464	0.9492	0.9515	0.8777	6.0	discard	concentration penalty weight 3.0: over-suppresses, -0.034 vs weight 1.0; dose-response says 1.0 is near optimal
+6fa8812	0.8558	0.9789	0.9390	0.9531	0.9576	0.9806	0.8993	6.0	keep	BEST: mirror TTA (A/B-neutral on AP) + wider affine aug (rot 15 scale 0.82-1.22 shift 8pct): +0.009 AP, late decay largely gone, loc 0.98 froc 0.899
+3185ae9	0.8439	0.9795	0.9304	0.9627	0.9552	0.9417	0.8921	6.0	discard	augmentation dose-response rot22/scale0.75-1.30: peak -0.012 vs run9 (flatter but lower); optimum bracketed at run9 setting
+27a2778	0.8335	0.9797	0.9286	0.9589	0.9533	0.9515	0.8633	12.4	discard	native 768x1024 input: best-ever image-level AUC 0.982 but AP -0.022 and FROC -0.036 (37pct fewer steps); resolution helps detection not box precision
+6985218	0.8781	0.9785	0.9386	0.9445	0.9553	0.9612	0.9137	6.0	keep	BEST: auxiliary mimic channels (text/metal/periosteal/other) on the fracture map: +0.022 AP whole plateau lifted; FROC best 0.914
+b347ad8	0.8696	0.9804	0.9363	0.9512	0.9557	0.9515	0.9065	6.0	discard	mimic-channel weight 1.0: -0.009 vs weight 0.5; 0.5 retained
+6661a6c	0.8624	0.9809	0.9468	0.9435	0.9594	0.9320	0.8921	6.2	discard	best recipe + pseudo-boxes at 600s: AP falls immediately after relabelling (0.862->0.839->0.804); self-training no longer additive once mimic channels and concentration loss are in
+7f9e663	0.8550	0.9791	0.9249	0.9636	0.9524	0.9709	0.8993	6.0	discard	LSE readout temperature 12 (sharper): flatter plateau but peak -0.023; r=6 retained
+78bad11	0.8570	0.9791	0.9390	0.9455	0.9558	0.9417	0.9065	6.0	discard	photometric aug (blur/noise/wider gamma): flatter tail, peak -0.021; geometric aug already captures the regularisation benefit
+8023395	0.8666	0.9811	0.9377	0.9550	0.9573	0.9515	0.8993	6.0	discard	GIoU box loss weight 2.5: -0.011 vs 1.0; more box emphasis does not tighten AP
+ac8ab78	0.8150	0.9811	0.9318	0.9560	0.9543	0.9806	0.8777	6.0	discard	two cosine cycles: second cycle peaks no higher (0.815); EMA already spans the restart
+7cf18c7	0.8635	0.9822	0.9422	0.9569	0.9601	0.9417	0.8993	6.0	discard	outlined-fracture oversampling 8x->5x: AP -0.015 though best-ever AUC 0.9822; 8x retained
+6985218	nan	nan	nan	nan	nan	nan	nan	0.0	crash	run12 first attempt: mirror-TTA broadcast bug once the head became multi-channel (5-ch map indexed into a 1-ch gather); fixed by slicing the mirrored map, re-run as run12
+d941230	0.8717	0.9783	0.9295	0.9493	0.9516	0.9806	0.9281	11.9	discard	FPN/head width 128->256: AP -0.006 (within noise) though best-ever FROC 0.928 and loc 0.981; head capacity is not the limiter
+9cc43b2	0.8449	0.9794	0.9409	0.9455	0.9567	0.9515	0.9065	6.0	discard	concentration penalty protecting only top-1 peak: -0.033; suppresses genuine second fractures (25pct of films have >1); topk=2 retained
+c08a620	nan	nan	nan	nan	nan	nan	nan	0.0	crash	quality-weighted map via logit(p*q): gradient 1/(p(1-p)) explodes as the product approaches 0, NaN at 600s; reformulated in log-space
+3d0262d	0.7998	0.9785	0.9372	0.9512	0.9561	0.9515	0.8633	6.0	discard	localisation-quality channel (log-space, stable): -0.078; quality term suppresses genuine low-evidence detections more than it demotes bad ones
+d1ec722	0.8406	0.9783	0.9204	0.9531	0.9475	0.9417	0.8993	6.0	discard	fracture-free film sampling 1.5->2.5: -0.038; extra negatives crowd out box supervision
+fd4bfb2	0.8536	0.9814	0.9490	0.9474	0.9615	0.9709	0.9137	6.0	discard	concentration penalty from 120s instead of 300s: -0.025; needs a usable evidence map before suppressing
+062ccc1	0.8298	0.9807	0.9395	0.9512	0.9573	0.9417	0.8993	6.0	discard	REPRODUCIBILITY PROBE: run12 config with seed 1 scores 0.830 vs 0.878 - seed noise on AP is ~0.05 given only 139 held-out outlines; secondary metrics stable (auc 0.981 vs 0.979 sens 0.939 both). Keeping seed 0.

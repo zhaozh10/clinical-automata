@@ -1,0 +1,32 @@
+commit	mAP@50	mAP@50:95	fracture_recall@50	fracture_precision@50	f1@50	memory_gb	status	description	test_mAP@50	test_mAP@50:95	test_fracture_recall@50	test_fracture_precision@50	test_f1@50
+7b4fd73	0.8992	0.4563	0.9008	0.7485	0.8176	6.7	keep	baseline Faster R-CNN v2 ResNet50-FPN	0.9261	0.4705	0.9276	0.7739	0.8438
+67c3687	0.9033	0.4684	0.8970	0.7777	0.8331	9.8	keep	higher res 800/1333 + LR warmup	0.9162	0.4810	0.9134	0.7850	0.8444
+c24d3d2	0.9069	0.4894	0.9037	0.7776	0.8359	9.9	keep	AdamW LR=1e-4 wd=0.01	0.9231	0.4985	0.9212	0.7865	0.8485
+1ea682e	0.8874	0.4274	0.9054	0.6576	0.7618	9.9	discard	stronger augs + LR=2e-4 (too slow)	nan	nan	nan	nan	nan
+2b0629a	0.9077	0.4638	0.9128	0.7128	0.8005	13.9	keep	freeze backbone 3ep then unfreeze	0.9238	0.4810	0.9306	0.7179	0.8105
+c39d0a9	0.8991	0.4717	0.8949	0.7696	0.8275	9.9	discard	differential LR backbone=1e-5 head=1e-4	nan	nan	nan	nan	nan
+265d45a	0.5151	0.2359	0.3249	0.9595	0.4854	10.1	discard	EMA decay=0.999 diverged	nan	nan	nan	nan	nan
+b22a4f4	0.9049	0.4978	0.7943	0.9389	0.8606	0.7	discard	YOLO11m imgsz=640 (close but below best)	nan	nan	nan	nan	nan
+0620d5e	0.9069	0.5012	0.7915	0.9486	0.8629	0.9	discard	YOLO11l imgsz=800 (close but below best)	nan	nan	nan	nan	nan
+1d913d1	0.8929	0.4777	0.7500	0.9459	0.8366	1.4	discard	YOLO11l imgsz=1024 no mosaic	nan	nan	nan	nan	nan
+b9d97d3	0.9000	0.4956	0.7862	0.9431	0.8575	10.9	discard	RetinaNet focal loss	nan	nan	nan	nan	nan
+d2a5531	0.8899	0.4327	0.8938	0.7105	0.7917	13.9	discard	custom anchors (pretrained mismatch)	nan	nan	nan	nan	nan
+b640e3a	0.8913	0.4689	0.8857	0.7193	0.7939	24.1	discard	ResNet-101-FPN (too slow only 9ep)	nan	nan	nan	nan	nan
+c8b4ed9	0.8941	0.4573	0.9012	0.7014	0.7889	13.9	discard	percentile norm (slower fewer epochs)	nan	nan	nan	nan	nan
+dc07e3e	0.9033	0.4822	0.9044	0.6989	0.7885	14.3	discard	eval every 2ep + grad clip (no freeze)	nan	nan	nan	nan	nan
+1e1f9b1	0.8901	0.4439	0.9068	0.6812	0.7780	14.3	discard	freeze/unfreeze + eval 2ep + grad clip	nan	nan	nan	nan	nan
+4a68aaa	0.9096	0.4825	0.9075	0.7578	0.8259	9.9	keep	trainable_backbone_layers=3	0.9225	0.4887	0.9215	0.7641	0.8355
+bf30b3f	0.9096	0.4835	0.9139	0.7321	0.8129	9.9	discard	grad clip on top (tied no gain)	nan	nan	nan	nan	nan
+3b5e6de	0.9054	0.4805	0.9005	0.7593	0.8239	7.6	discard	trainable_backbone_layers=2 (too frozen)	nan	nan	nan	nan	nan
+e1cd3a2	0.9016	0.4633	0.8998	0.7535	0.8202	9.9	discard	LR=2e-4 (oscillation)	nan	nan	nan	nan	nan
+7edbaec	0.9085	0.4791	0.8994	0.7733	0.8316	13.1	discard	trainable_backbone_layers=4	nan	nan	nan	nan	nan
+3efcfff	0.9033	0.4604	0.8889	0.7885	0.8357	9.9	discard	weight_decay=0.001	nan	nan	nan	nan	nan
+9cdab0a	0.9062	0.4746	0.9072	0.7420	0.8163	9.9	discard	multi-task 9 classes	nan	nan	nan	nan	nan
+e6e007c	0.9104	0.4815	0.9005	0.8021	0.8484	9.9	keep	CosineAnnealingWarmRestarts T0=4	0.9288	0.4971	0.9228	0.8099	0.8626
+e25d72a	0.8994	0.4604	0.8928	0.7720	0.8280	9.8	discard	SGD lr=0.005 (worse than AdamW)	nan	nan	nan	nan	nan
+6de9b8e	0.9089	0.4893	0.9040	0.7777	0.8361	18.9	discard	batch_size=16 per GPU	nan	nan	nan	nan	nan
+a4cbb87	0.9088	0.4902	0.9072	0.7934	0.8465	9.9	discard	warm restarts T_0=3	nan	nan	nan	nan	nan
+88bb178	0.9116	0.4709	0.9040	0.7903	0.8434	6.8	keep	min_size=640 + warm restarts T0=4	0.9313	0.4903	0.9279	0.8060	0.8627
+631fdd7	0.9155	0.4962	0.9072	0.8037	0.8523	6.8	keep	min_size=640 + warm restarts T0=3	0.9318	0.5114	0.9297	0.8172	0.8698
+e9a4d29	0.9118	0.4770	0.9068	0.7860	0.8421	6.8	discard	warm restarts T0=2 (too aggressive)	nan	nan	nan	nan	nan
+dc07e3e	0.9033	0.4822	0.9044	0.6989	0.7885	14.3	discard	eval every 2ep + grad clip (no freeze)	nan	nan	nan	nan	nan

@@ -1,0 +1,22 @@
+commit	mel_auc	mel_sensitivity	mel_specificity	mel_to_nv_rate	overall_auc	macro_f1	memory_gb	status	description	test_mel_auc	test_mel_sensitivity	test_mel_specificity	test_mel_to_nv_rate	test_overall_auc	test_macro_f1
+2de2bfb	0.8391	0.5865	0.8885	0.0920	0.8908	0.4623	18.7	discard	baseline convnext_base 384px 2epochs (DataParallel bottleneck)	0.8402	0.5516	0.9042	0.0580	0.8738	0.4787
+366cd69	0.9001	0.8248	0.8184	0.0732	0.8701	0.5915	18.6	keep	baseline single GPU 16 epochs convnext_base 384px	0.8932	0.7988	0.8133	0.0761	0.8491	0.5416
+08cd5a8	0.9012	0.7749	0.8184	0.1231	0.8530	0.6413	18.6	keep	warmup+cosine schedule LR=3e-4 20 epochs	0.9081	0.7913	0.8594	0.0912	0.8171	0.5735
+73c16d3	0.9072	0.7439	0.8806	0.1652	0.9309	0.6582	18.6	keep	focal loss gamma=2 + grad clip LR=2e-4	0.9037	0.7460	0.8849	0.1424	0.9108	0.5738
+04fb75a	0.9038	0.8115	0.8338	0.1053	0.8611	0.6368	18.6	discard	weighted CE + 2x mel boost LR=1e-4	nan	nan	nan	nan	nan	nan
+7ff9e7d	0.8740	0.7871	0.9150	0.0432	0.9150	0.4877	11.9	discard	two-stage frozen backbone + partial unfreeze	nan	nan	nan	nan	nan	nan
+4d5f848	0.9185	0.7284	0.9150	0.1729	0.9405	0.6949	19.0	keep	CutMix+Mixup + EMA + weighted CE LR=1.5e-4	0.9155	0.7415	0.9095	0.1258	0.9153	0.6292
+1c60ec5	0.9080	0.7583	0.9334	0.1231	0.9334	0.6752	19.0	discard	CutMix+EMA + MEL→NV penalty alpha=0.5	nan	nan	nan	nan	nan	nan
+3347b87	0.9023	0.6752	0.9405	0.1741	0.9405	0.6611	19.6	discard	ConvNeXt-Large CLIP 198M params too few epochs	nan	nan	nan	nan	nan	nan
+5e0b496	0.9155	0.7827	0.8636	0.1153	0.9515	0.6803	19.0	discard	3x mel oversample + 2.5x mel loss weight	nan	nan	nan	nan	nan	nan
+1062352	0.9159	0.7805	0.9294	0.1463	0.9351	0.6646	19.0	discard	LR=2e-4 + 2x mel weight + 2x mel oversample	nan	nan	nan	nan	nan	nan
+6b577c5	0.9173	0.7217	0.9175	0.1718	0.9175	0.6838	19.0	discard	drop_path=0.2 + CutMix prob 0.6 + EMA 0.998	nan	nan	nan	nan	nan	nan
+82515ea	0.8902	0.6608	0.9443	0.1707	0.9443	0.6377	19.0	discard	EVA-02 ViT 448px too few epochs (7)	nan	nan	nan	nan	nan	nan
+2057fff	0.9175	0.7018	0.9359	0.1885	0.9359	0.6962	19.0	discard	CutMix-off after epoch 12 + 2x mel weight	nan	nan	nan	nan	nan	nan
+72e608e	0.9177	0.7140	0.9388	0.1774	0.9388	0.6951	19.0	discard	RandAugment + CutMix 0.7 + no label smoothing	nan	nan	nan	nan	nan	nan
+9759809	0.9144	0.7062	0.9467	0.1940	0.9467	0.6912	19.0	discard	gradient accum 2x effective BS=96 LR=2e-4	nan	nan	nan	nan	nan	nan
+f628fd2	0.8964	0.6718	0.9110	0.2051	0.9110	0.6474	19.0	discard	CLIP LAION-2B ConvNeXt-Base 384px	nan	nan	nan	nan	nan	nan
+c96c681	0.9167	0.6940	0.9459	0.1962	0.9459	0.6952	19.0	discard	cosine warm restarts T_0=5 T_mult=2 WD=5e-4	nan	nan	nan	nan	nan	nan
+0df7011	0.9157	0.7140	0.9412	0.1641	0.9412	0.6914	19.0	discard	layer-wise LR decay 0.7 + 384px native backbone	nan	nan	nan	nan	nan	nan
+faea626	0.9158	0.7273	0.9203	0.1696	0.9203	0.6964	17.0	discard	512px resolution BS=24	nan	nan	nan	nan	nan	nan
+28964bc	0.9121	0.7040	0.9467	0.1829	0.9467	0.6762	19.0	discard	label smoothing 0.02 (too low)	nan	nan	nan	nan	nan	nan
